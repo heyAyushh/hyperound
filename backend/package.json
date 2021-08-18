@@ -7,5 +7,15 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "team-undefined",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "dotenv": "^10.0.0",
+    "fastify": "^3.20.2",
+    "fastify-oauth2": "^4.2.3",
+    "fastify-passport": "^0.4.3",
+    "fastify-secure-session": "^2.3.1",
+    "mongoose": "^5.13.7",
+    "passport-twitter": "^1.0.4"
+  }
 }
