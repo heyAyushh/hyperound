@@ -1,7 +1,7 @@
 require('dotenv').config()
-const axios = require('axios')
+// const axios = require('axios')
 const fastify = require('fastify')({ logger: true })
-const oauthPlugin = require('fastify-oauth2')
+// const oauthPlugin = require('fastify-oauth2')
 const grant = require('grant').fastify()
 
 fastify
@@ -35,7 +35,6 @@ fastify.get('/login/twitter/done', async (request, reply) => {
   console.log(request.session.grant.response)
   reply.send()
 })
-
 
 const start = async () => {
   try {

@@ -4,7 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "standard --fix"
   },
   "author": "team-undefined",
   "license": "UNLICENSED",
@@ -19,5 +20,8 @@
     "fastify-session": "^5.2.1",
     "grant": "^5.4.16",
     "mongoose": "^5.13.7"
+  },
+  "devDependencies": {
+    "standard": "^16.0.3"
   }
 }
