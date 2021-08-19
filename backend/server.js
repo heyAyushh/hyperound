@@ -1,37 +1,33 @@
 require('dotenv').config()
 const axios = require('axios')
 const fastify = require('fastify')({ logger: true })
-const fastifyPassport = require('fastify-passport')
-const fastifySecureSession = require('fastify-secure-session')
 const oauthPlugin = require('fastify-oauth2')
-const TwitterStrategy = require('passport-twitter')
+const grant = require('grant').fastify()
 
-fastify.register(fastifySecureSession, { key: process.env.SESSION_KEY })
-fastify.register(fastifyPassport.initialize())
-fastify.register(fastifyPassport.secureSession())
+fastify
+  .register(require('fastify-cookie'))
+  .register(require('fastify-session'), {secret: process.env.COOKIE_KEY, cookie: { secure: false }})
+  .register(grant({
+    "defaults": {
+      "origin": "http://localhost:3000",
+      "transport": "session",
+      "state": true,
+      "prefix": "/login"
+    },
+    "twitter": {
+      "key": process.env.TWITTER_API_KEY,
+      "secret": process.env.TWITTER_API_SECRET_KEY
+    }
+}))
 
-fastifyPassport.use('twitter', new TwitterStrategy({
-    consumerKey: process.env.TWITTER_API_KEY,
-    consumerSecret: process.env.TWITTER_API_SECRET_KEY,
-    callbackURL: `http://localhost:${process.env.port || 3000}/login/twitter/callback`
-  },
-  async function(token, tokenSecret, profile, callback) {
-    return callback;
-  }
-));
+fastify.register(require('fastify-cors'), {
+  origin: 'http://localhost:3000',
+  credentials: true
+})
 
 fastify.get('/', async (request, reply) => {
     reply.send('Team-Undefined API')
 })
-
-fastify.get('/login/twitter', fastifyPassport.authenticate('twitter'))
-
-fastify.get('/login/twitter/callback',
-  { preValidation: fastifyPassport.authenticate('twitter', { failureRedirect: '/login' }) },
-  async (request, reply) => {
-    reply.send()
-})
-
 
 const start = async() => {
   try {
