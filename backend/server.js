@@ -12,14 +12,13 @@ fastify
       origin: 'http://localhost:3000',
       transport: 'session',
       state: true,
-      //prefix: '/login'
+      prefix: '/login'
     },
     twitter: {
       key: process.env.TWITTER_API_KEY,
       secret: process.env.TWITTER_API_SECRET_KEY,
-      scope: ['read'],
-      callback: '/login/twitter/callback',
-      response: ['tokens', 'raw']
+      callback: '/login/twitter/done',
+      response: ['tokens', 'raw', 'profile']
     }
   }))
 
@@ -32,7 +31,7 @@ fastify.get('/', async (request, reply) => {
   reply.send('Team-Undefined API')
 })
 
-fastify.get('/login/twitter/callback', async (request, reply) => {
+fastify.get('/login/twitter/done', async (request, reply) => {
   console.log(request.session.grant.response)
   reply.send()
 })
