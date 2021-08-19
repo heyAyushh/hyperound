@@ -6,19 +6,22 @@ const grant = require('grant').fastify()
 
 fastify
   .register(require('fastify-cookie'))
-  .register(require('fastify-session'), {secret: process.env.COOKIE_KEY, cookie: { secure: false }})
+  .register(require('fastify-session'), { secret: process.env.COOKIE_KEY, cookie: { secure: false } })
   .register(grant({
-    "defaults": {
-      "origin": "http://localhost:3000",
-      "transport": "session",
-      "state": true,
-      "prefix": "/login"
+    defaults: {
+      origin: 'http://localhost:3000',
+      transport: 'session',
+      state: true,
+      //prefix: '/login'
     },
-    "twitter": {
-      "key": process.env.TWITTER_API_KEY,
-      "secret": process.env.TWITTER_API_SECRET_KEY
+    twitter: {
+      key: process.env.TWITTER_API_KEY,
+      secret: process.env.TWITTER_API_SECRET_KEY,
+      scope: ['read'],
+      callback: '/login/twitter/callback',
+      response: ['tokens', 'raw']
     }
-}))
+  }))
 
 fastify.register(require('fastify-cors'), {
   origin: 'http://localhost:3000',
@@ -26,10 +29,16 @@ fastify.register(require('fastify-cors'), {
 })
 
 fastify.get('/', async (request, reply) => {
-    reply.send('Team-Undefined API')
+  reply.send('Team-Undefined API')
 })
 
-const start = async() => {
+fastify.get('/login/twitter/callback', async (request, reply) => {
+  console.log(request.session.grant.response)
+  reply.send()
+})
+
+
+const start = async () => {
   try {
     await fastify.listen(process.env.PORT || 3000, function (err, address) {
       if (err) {
@@ -37,7 +46,7 @@ const start = async() => {
       }
       console.log(`🚀 Server listening on ${address}...`)
     })
-  } catch(err) {
+  } catch (err) {
     console.error('❎ error:', err)
     process.exit(1)
   }
