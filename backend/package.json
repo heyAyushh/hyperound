@@ -19,7 +19,8 @@
     "fastify-passport": "^0.4.3",
     "fastify-session": "^5.2.1",
     "grant": "^5.4.16",
-    "mongoose": "^5.13.7"
+    "mongoose": "^5.13.7",
+    "nanoid": "^3.1.25"
   },
   "devDependencies": {
     "standard": "^16.0.3"
