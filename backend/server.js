@@ -4,7 +4,9 @@ const fastify = require('fastify')({ logger: true })
 // const oauthPlugin = require('fastify-oauth2')
 const grant = require('grant').fastify()
 const mongoose = require('mongoose')
+const { nanoid } = require('nanoid')
 const { User } = require('./models/user.js')
+const { Challenge } = require('./models/challenge.js')
 
 fastify
   .register(require('fastify-cookie'))
@@ -52,11 +54,49 @@ fastify.get('/login/twitter/done', async (request, reply) => {
       }
     })
     const userObj = await newUser.save()
-    request.session.user = { id: userObj._id }
+    request.session.user.id = userObj._id
   } else {
-    request.session.user = { id: userQuery._id }
+    request.session.user.id = userQuery._id
   }
   reply.send()
+})
+
+fastify.get('/login/wallet/challenge', async (request, reply) => {
+  try {
+    if (!/^([A-Za-z0-9]{44})$/.test(request.query.address)) {
+      reply.code(400).send({'error': 'Invalid address sent'})
+      return
+    }
+    const newChallenge = `Hey, please sign this to verify your address! ${await nanoid(8)}`
+    const oldChallenge = await Challenge.findOne({ address: request.query.address })
+    if (!oldChallenge) {
+      await Challenge.create({
+        address: request.query.address,
+        challenge: newChallenge
+      })
+    } else {
+      await Challenge.updateOne(
+        { address: request.query.address },
+        { challenge: newChallenge, updatedAt: Date.now() }
+      )
+    }
+    reply.send({ challenge: newChallenge })
+  } catch(err) {
+    fastify.log.error('❎ error:' + err)
+    if (!reply.sent) {
+      reply.sendStatus(400)
+    }
+  }
+})
+
+fastify.get('/login/wallet/done', async (request, reply) => {
+  const challengeQuery = await Challenge.findOne({
+    address: request.body.address,
+    challenge: request.body.challenge
+  }).lean()
+  if (!challengeQuery) {
+    reply.sendStatus(400)
+  }
 })
 
 const start = async () => {
