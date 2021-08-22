@@ -20,15 +20,16 @@ module.exports = function (fastify, opts, done) {
           }
         })
         const userObj = await newUser.save()
-        request.session.user = { id: userObj._id }
+        request.session.user_id = userObj._id
       } else {
-        request.session.user = { id: userQuery._id }
+        request.session.user_id = userQuery._id
+        console.log(request.session)
       }
       reply.send()
     } catch (err) {
       fastify.log.error('❎ error:' + err)
       if (!reply.sent) {
-        reply.sendStatus(400)
+        reply.code(400).send()
       }
     }
   })
@@ -56,7 +57,7 @@ module.exports = function (fastify, opts, done) {
     } catch (err) {
       fastify.log.error('❎ error:' + err)
       if (!reply.sent) {
-        reply.sendStatus(400)
+        reply.code(400).send()
       }
     }
   })
@@ -82,7 +83,7 @@ module.exports = function (fastify, opts, done) {
     } catch (err) {
       fastify.log.error('❎ error:' + err)
       if (!reply.sent) {
-        reply.sendStatus(400)
+        reply.code(400).send()
       }
     }
   })

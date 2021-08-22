@@ -2,15 +2,15 @@ const mongoose = require('mongoose')
 
 const postSchema = new mongoose.Schema({
   creator: {
-    type: mongoose.schemaTypes.ObjectId,
+    type: mongoose.ObjectId,
     required: true
   },
   text: String,
   content: String,
   content_type: {
     type: String,
-    enum: ["image", "embed"]
-  }
+    enum: ['image', 'embed']
+  },
   locked: {
     type: Boolean,
     required: true,

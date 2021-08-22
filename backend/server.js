@@ -5,14 +5,16 @@ const fastify = require('fastify')({ logger: true })
 const grant = require('grant').fastify()
 const mongoose = require('mongoose')
 
+const SESSION_TTL = 604800 // 7 DAYS
+
 fastify
   .register(require('fastify-cookie'))
-  .register(require('fastify-session'),
+  .register(require('@fastify/session'),
     {
       secret: process.env.COOKIE_KEY,
       cookie: {
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 604800,
+        maxAge: SESSION_TTL,
         sameSite: 'Lax',
         domain: process.env.DOMAIN
       }
@@ -39,9 +41,12 @@ fastify.register(require('fastify-cors'), {
 
 fastify.get('/', async (request, reply) => {
   reply.send('Hyperound API')
+  console.log(request.session.user_id)
 })
 
+fastify.register(require('./helpers/authenticate'))
 fastify.register(require('./routes/login'))
+fastify.register(require('./routes/post'))
 
 const start = async () => {
   try {
