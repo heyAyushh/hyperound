@@ -17,7 +17,8 @@ fastify
       cookie: {
         secure: process.env.NODE_ENV === 'production',
         maxAge: 604800,
-        domain: process.env.BASE_URL
+        sameSite: 'Lax',
+        domain: process.env.DOMAIN,
       }
     })
   .register(grant({
@@ -36,7 +37,7 @@ fastify
   }))
 
 fastify.register(require('fastify-cors'), {
-  origin: process.env.BASE_URL,
+  origin: [process.env.BASE_URL, process.env.DOMAIN],
   credentials: true
 })
 
@@ -59,9 +60,9 @@ fastify.get('/login/twitter/done', async (request, reply) => {
       }
     })
     const userObj = await newUser.save()
-    request.session.user.id = userObj._id
+    request.session.user = { id: userObj._id }
   } else {
-    request.session.user.id = userQuery._id
+    request.session.user = { id: userQuery._id }
   }
   reply.send()
 })
@@ -110,7 +111,7 @@ fastify.get('/login/wallet/done', async (request, reply) => {
       return
     }
     const userQuery = await User.findOne({ address: request.body.address }).lean()
-    request.session.user.id = userQuery._id
+    request.session.user = { id: userQuery._id }
     reply.sendStatus(200)
   } catch (err) {
     fastify.log.error('❎ error:' + err)
