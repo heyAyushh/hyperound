@@ -14,7 +14,11 @@ fastify
   .register(require('fastify-session'),
     {
       secret: process.env.COOKIE_KEY,
-      cookie: { secure: process.env.NODE_ENV === 'production', maxAge: 604800 }
+      cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 604800,
+        domain: process.env.BASE_URL
+      }
     })
   .register(grant({
     defaults: {
