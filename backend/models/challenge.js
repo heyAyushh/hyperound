@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const challengeSchema = new mongoose.Schema({
   address: {
     type: String,
-    unique: true,
+    unique: true
   },
   challenge: {
     type: String,

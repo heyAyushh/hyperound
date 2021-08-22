@@ -3,11 +3,11 @@ const mongoose = require('mongoose')
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
-    unique: true,
+    unique: true
   },
   address: {
     type: String,
-    unique: true,
+    unique: true
   },
   twitter: {
     id: {
