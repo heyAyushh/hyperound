@@ -1,9 +1,11 @@
 const mongoose = require('mongoose')
+const { nanoid } = require('nanoid')
 
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
-    unique: true
+    unique: true,
+    default: nanoid(8)
   },
   address: {
     type: String,
