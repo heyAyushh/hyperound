@@ -5,25 +5,32 @@ const { Challenge } = require('../models/challenge.js')
 
 module.exports = function (fastify, opts, done) {
   fastify.get('/login/twitter/done', async (request, reply) => {
-    const twitterResponse = request.session.grant.response
-    const userQuery = await User.findOne(
-      { 'twitter.id': twitterResponse.raw.user_id },
-      { __v: 0, createdAt: 0, updatedAt: 0 })
-      .lean()
-    if (!userQuery) {
-      const newUser = new User({
-        twitter: {
-          id: twitterResponse.raw.user_id,
-          screen_name: twitterResponse.raw.screen_name,
-          verified: twitterResponse.profile.verified
-        }
-      })
-      const userObj = await newUser.save()
-      request.session.user = { id: userObj._id }
-    } else {
-      request.session.user = { id: userQuery._id }
+    try {
+      const twitterResponse = request.session.grant.response
+      const userQuery = await User.findOne(
+        { 'twitter.id': twitterResponse.raw.user_id },
+        { __v: 0, createdAt: 0, updatedAt: 0 })
+        .lean()
+      if (!userQuery) {
+        const newUser = new User({
+          twitter: {
+            id: twitterResponse.raw.user_id,
+            screen_name: twitterResponse.raw.screen_name,
+            verified: twitterResponse.profile.verified
+          }
+        })
+        const userObj = await newUser.save()
+        request.session.user = { id: userObj._id }
+      } else {
+        request.session.user = { id: userQuery._id }
+      }
+      reply.send()
+    } catch (err) {
+      fastify.log.error('❎ error:' + err)
+      if (!reply.sent) {
+        reply.sendStatus(400)
+      }
     }
-    reply.send()
   })
 
   fastify.get('/login/wallet/challenge', async (request, reply) => {
