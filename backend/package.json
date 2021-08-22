@@ -20,7 +20,8 @@
     "fastify-session": "^5.2.1",
     "grant": "^5.4.16",
     "mongoose": "^5.13.7",
-    "nanoid": "^3.1.25"
+    "nanoid": "^3.1.25",
+    "tweetnacl": "^1.0.3"
   },
   "devDependencies": {
     "standard": "^16.0.3"

@@ -4,6 +4,7 @@ const fastify = require('fastify')({ logger: true })
 // const oauthPlugin = require('fastify-oauth2')
 const grant = require('grant').fastify()
 const mongoose = require('mongoose')
+const { nacl } = require('tweetnacl')
 const { nanoid } = require('nanoid')
 const { User } = require('./models/user.js')
 const { Challenge } = require('./models/challenge.js')
@@ -13,7 +14,7 @@ fastify
   .register(require('fastify-session'),
     {
       secret: process.env.COOKIE_KEY,
-      cookie: { secure: false, maxAge: 604800 }
+      cookie: { secure: process.env.NODE_ENV === 'production', maxAge: 604800 }
     })
   .register(grant({
     defaults: {
@@ -36,14 +37,14 @@ fastify.register(require('fastify-cors'), {
 })
 
 fastify.get('/', async (request, reply) => {
-  reply.send('Team-Undefined API')
+  reply.send('Hyperound API')
 })
 
 fastify.get('/login/twitter/done', async (request, reply) => {
   const twitterResponse = request.session.grant.response
   const userQuery = await User.findOne(
-    { "twitter.id": twitterResponse.raw.user_id },
-    { __v:0, createdAt: 0, updatedAt: 0 })
+    { 'twitter.id': twitterResponse.raw.user_id },
+    { __v: 0, createdAt: 0, updatedAt: 0 })
     .lean()
   if (!userQuery) {
     const newUser = new User({
@@ -64,7 +65,7 @@ fastify.get('/login/twitter/done', async (request, reply) => {
 fastify.get('/login/wallet/challenge', async (request, reply) => {
   try {
     if (!/^([A-Za-z0-9]{44})$/.test(request.query.address)) {
-      reply.code(400).send({'error': 'Invalid address sent'})
+      reply.code(400).send({ error: 'Invalid address sent' })
       return
     }
     const newChallenge = `Hey, please sign this to verify your address! ${await nanoid(8)}`
@@ -81,7 +82,7 @@ fastify.get('/login/wallet/challenge', async (request, reply) => {
       )
     }
     reply.send({ challenge: newChallenge })
-  } catch(err) {
+  } catch (err) {
     fastify.log.error('❎ error:' + err)
     if (!reply.sent) {
       reply.sendStatus(400)
@@ -90,12 +91,28 @@ fastify.get('/login/wallet/challenge', async (request, reply) => {
 })
 
 fastify.get('/login/wallet/done', async (request, reply) => {
-  const challengeQuery = await Challenge.findOne({
-    address: request.body.address,
-    challenge: request.body.challenge
-  }).lean()
-  if (!challengeQuery) {
-    reply.sendStatus(400)
+  try {
+    const challengeQuery = await Challenge.findOne({ address: request.body.address }).lean()
+    if (!challengeQuery) {
+      reply.code(400).send({ error: 'Non-existent challenge' })
+      return
+    }
+    if (!nacl.sign.detached.verify(
+      challengeQuery.challenge,
+      request.body.signature,
+      challengeQuery.address
+    )) {
+      reply.code(403).send({ error: 'Invalid signature for PubKey' })
+      return
+    }
+    const userQuery = await User.findOne({ address: request.body.address }).lean()
+    request.session.user.id = userQuery._id
+    reply.sendStatus(200)
+  } catch (err) {
+    fastify.log.error('❎ error:' + err)
+    if (!reply.sent) {
+      reply.sendStatus(400)
+    }
   }
 })
 
