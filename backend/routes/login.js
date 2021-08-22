@@ -23,7 +23,6 @@ module.exports = function (fastify, opts, done) {
         request.session.user_id = userObj._id
       } else {
         request.session.user_id = userQuery._id
-        console.log(request.session)
       }
       reply.send()
     } catch (err) {
@@ -70,15 +69,23 @@ module.exports = function (fastify, opts, done) {
         return
       }
       if (!nacl.sign.detached.verify(
-        challengeQuery.challenge,
+        request.body.challenge,
         request.body.signature,
-        challengeQuery.address
+        request.body.address
       )) {
         reply.code(403).send({ error: 'Invalid signature for PubKey' })
         return
       }
       const userQuery = await User.findOne({ address: request.body.address }).lean()
-      request.session.user = { id: userQuery._id }
+      if (!userQuery) {
+        const newUser = new User({
+          address: request.body.address
+        })
+        const userObj = await newUser.save()
+        request.session.user_id = userObj._id
+      } else {
+        request.session.user_id = userQuery._id
+      }
       reply.sendStatus(200)
     } catch (err) {
       fastify.log.error('❎ error:' + err)

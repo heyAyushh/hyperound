@@ -8,14 +8,10 @@ const userSchema = new mongoose.Schema({
     default: nanoid(8)
   },
   address: {
-    type: String,
-    unique: true
+    type: String
   },
   twitter: {
-    id: {
-      type: String,
-      unique: true
-    },
+    id: String,
     screen_name: String,
     verified: Boolean
   },
