@@ -46,28 +46,31 @@ export const WalletDialog: FC = ({
   }, [children, connecting, disconnecting, connected, wallet]);
 
   const signLoginString = async () => {
-    // axios({
-    //   method: "get",
-    //   url: `https://api.hyperound.com/login/challenge`,
-    //   data: {
-    //     address: provider && provider.publicKey ? provider.publicKey : ""
-    //   }
-    // }).then((res: any) => {
-    //   console.log(res.data.challenge);
-    // }).catch((err: any) => {
-    //   console.error(err);
-    // })
+    const challenge_req = await axios({
+      method: "get",
+      url: `https://api.hyperound.com/login/wallet/challenge?address=${provider && provider.publicKey ? provider.publicKey : ""}`
+    })
 
-    const message = "smortboi";
-    // sign message and convert back to string
-    const data = new TextEncoder().encode(message);
+    const data = new TextEncoder().encode(challenge_req.data.challenge);
     const signedMsg = await provider.signMessage(data);
+    const signature_array = [...signedMsg.signature];
+    console.log(signature_array);
     const signedMsgString = new TextDecoder().decode(signedMsg.signature);
-  }
 
-  useEffect(() => {
-    provider && provider.publicKey ? console.log(provider.publicKey?.toBase58()) : console.log('no public key');
-  })
+    try {
+      // console.log(provider.publicKey)
+      const done_req = await axios({
+        method: "post",
+        url: `https://api.hyperound.com/login/wallet/done`,
+        data: {
+          address: provider ? provider.publicKey?.toBase58() : "",
+          signature: signature_array
+        }
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
     <div>
