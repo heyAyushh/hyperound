@@ -107,7 +107,7 @@ export class PhantomWalletAdapter extends EventEmitter<WalletAdapterEvents> impl
 
                         wallet.on('connect', connect);
 
-                        wallet.connect().catch((reason: any) => {
+                        wallet.connect().catch((reason: unknown) => {
                             wallet.off('connect', connect);
                             reject(reason);
                         });
@@ -122,7 +122,7 @@ export class PhantomWalletAdapter extends EventEmitter<WalletAdapterEvents> impl
 
             let buffer: Buffer;
             try {
-                buffer = wallet.publicKey!.toBuffer();
+                buffer = wallet.publicKey?.toBuffer();
             } catch (error) {
                 throw new WalletAccountError(error?.message, error);
             }

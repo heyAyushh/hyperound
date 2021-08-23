@@ -1,7 +1,7 @@
 export class WalletError extends Error {
     public error: any;
 
-    constructor(message?: string, error?: any) {
+    constructor(message?: string, error?: unknown) {
         super(message);
         this.error = error;
     }

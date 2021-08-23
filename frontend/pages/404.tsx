@@ -1,7 +1,7 @@
 import Header from '../components/header';
 import { Page } from "@geist-ui/react";
 
-export default function Home() {
+export default function Home(): JSX.Element {
   return (
     <Page>
       <Header />

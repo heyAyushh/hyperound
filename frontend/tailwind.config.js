@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const { spacing, fontFamily } = require('tailwindcss/defaultTheme');
 
 module.exports = {
@@ -100,6 +101,9 @@ module.exports = {
       fontFamily: {
         sans: ['Inter var', fontFamily.sans],
       },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+      }
     },
   },
   variants: {

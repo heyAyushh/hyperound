@@ -4,24 +4,23 @@ import { ButtonDropdown, Image } from "@geist-ui/react";
 import { LogIn, Twitter } from "@geist-ui/react-icons";
 import { useRouter } from 'next/router'
 
-export interface WalletDialogProps extends Omit<any, 'title' | 'open'> {
+export interface WalletDialogProps extends Omit<unknown, 'title' | 'open'> {
   title?: ReactElement;
 }
 
-export const WalletDialog: FC<WalletDialogProps> = ({ title = 'Select your wallet',
-  onClose,
-  color = 'primary',
-  variant = 'contained',
+export const WalletDialog: FC = ({
   children,
-  disabled,
-  onClick,
-  ...props }) => {
-  const { wallets, select, wallet, connect, disconnect, connecting, disconnecting, connected } = useWallet();
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
+  onClick
+}) => {
+  const { wallets, select, wallet, disconnect, connecting, disconnecting, connected } = useWallet();
   const router = useRouter();
 
   const handleDisconnectClick: MouseEventHandler<HTMLButtonElement> = useCallback(
     (event) => {
       if (onClick) onClick(event);
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       if (!event.defaultPrevented) disconnect().catch(() => { });
     },
     [onClick, disconnect]
@@ -78,12 +77,12 @@ export const WalletDialog: FC<WalletDialogProps> = ({ title = 'Select your walle
           wallets.map((wlt) => (
             <ButtonDropdown.Item
               key={wlt.name}
-              onClick={(event) => {
+              onClick={() => {
                 select(wlt.name);
               }}>
               <div className="flex flex-row w-full pl-4">
                 <div className='w-6 bg-black rounded-full'>
-                  <Image src={wlt.icon} />
+                  <Image src={wlt.icon} alt="wallet-icon"/>
                 </div>
                 <div className='pl-8 pr-4 h-4 right text-m'>
                   {wlt.name}

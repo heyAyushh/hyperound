@@ -1,5 +1,6 @@
 import { WalletAdapter } from './adapter';
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function poll(callback: () => boolean | Promise<boolean>, interval: number, count: number) {
     if (count > 0) {
         setTimeout(async () => {
@@ -9,6 +10,7 @@ export function poll(callback: () => boolean | Promise<boolean>, interval: numbe
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function pollUntilReady(adapter: WalletAdapter, pollInterval: number, pollCount: number) {
     poll(
         () => {

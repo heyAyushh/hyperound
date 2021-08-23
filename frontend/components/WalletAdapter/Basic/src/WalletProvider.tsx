@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { WalletAdapter, WalletError, WalletNotConnectedError, WalletNotReadyError } from '../../base/src';
 import { Wallet, WalletName } from "../../wallets/src";
 import { PublicKey, Transaction } from '@solana/web3.js';

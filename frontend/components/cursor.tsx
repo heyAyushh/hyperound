@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react"
+import React from "react"
 
-export default function App() {
+export default function App(): JSX.Element {
   return (
     <div className="App">
       <div className="cursor" />

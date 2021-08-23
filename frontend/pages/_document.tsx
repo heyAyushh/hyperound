@@ -4,7 +4,11 @@ import { CssBaseline } from '@geist-ui/react'
 import flush from 'styled-jsx/server'
 
 class SITEDocument extends Document {
-  static async getInitialProps(ctx: DocumentContext) {
+  static async getInitialProps(ctx: DocumentContext): Promise<{
+    styles: JSX.Element;
+    html: string;
+    head?: JSX.Element[];
+}> {
     const initialProps = await Document.getInitialProps(ctx)
     const styles = CssBaseline.flush()
 
@@ -20,7 +24,7 @@ class SITEDocument extends Document {
     }
   }
 
-  render() {
+  render(): JSX.Element {
     return (
       <Html lang={SITE.language}>
         <Head />

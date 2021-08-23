@@ -5,7 +5,7 @@ import '../styles/global.css';
 
 const Geist = ({ Component, pageProps, router }) => {
 
-  let { theme } = useTheme();
+  const { theme } = useTheme();
 
   const ISSERVER = typeof window === "undefined";
 
@@ -42,10 +42,11 @@ const Geist = ({ Component, pageProps, router }) => {
   )
 }
 
-function MyApp({ Component, pageProps, router }) {
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+function MyApp({ Component, pageProps, router }): JSX.Element {
 
   return (
-    <ThemeProvider defaultTheme="system" attribute="class" >
+    <ThemeProvider defaultTheme="dark" attribute="class" >
       <AnimatePresence>
         <Geist Component={Component} pageProps={pageProps} router={router} />
       </AnimatePresence>
