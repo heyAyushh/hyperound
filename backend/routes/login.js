@@ -112,7 +112,7 @@ module.exports = function (fastify, opts, done) {
       }
       if (!nacl.sign.detached.verify(
         new TextEncoder().encode(challengeQuery.challenge),
-        request.body.signature,
+        new Uint8Array(request.body.signature),
         new TextEncoder().encode(request.body.address)
       )) {
         reply.code(403).send({ error: 'Invalid signature for PubKey' })
