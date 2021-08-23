@@ -4,7 +4,7 @@ const { User } = require('../models/user.js')
 module.exports = function (fastify, opts, done) {
   fastify.get('/profile/:userId', {
     schema: {
-      description: 'Fetch a profile by user ID or username',
+      description: 'Fetch a profile by user ID',
       params: {
         type: 'object',
         required: ['userId'],
