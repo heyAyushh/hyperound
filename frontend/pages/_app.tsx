@@ -1,8 +1,9 @@
 import { GeistProvider, CssBaseline } from "@geist-ui/react"
 import { ThemeProvider, useTheme } from 'next-themes';
+import { motion, AnimatePresence } from 'framer-motion';
 import '../styles/global.css';
 
-const Geist = ({ Component, pageProps }) => {
+const Geist = ({ Component, pageProps, router }) => {
 
   let { theme } = useTheme();
 
@@ -18,17 +19,37 @@ const Geist = ({ Component, pageProps }) => {
   return (
     <GeistProvider themeType={theme}>
       <CssBaseline />
-      <Component {...pageProps} />
+      <motion.div key={router.route} initial="pageInitial" animate="pageAnimate" exit="pageExit" variants={{
+        pageInitial: {
+          opacity: 0
+        },
+        pageAnimate: {
+          opacity: 1
+        },
+        pageExit: {
+          // filter: [
+          //   'hue-rotate(0) contrast(100%)',
+          //   'hue-rotate(360deg) contrast(200%)',
+          //   'hue-rotate(45deg) contrast(300%)',
+          //   'hue-rotate(0) contrast(100%)'
+          // ],
+          opacity: 0
+        }
+      }}>
+        <Component {...pageProps} />
+      </motion.div>
     </GeistProvider>
   )
 }
 
-function MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps, router }) {
 
   return (
     <ThemeProvider defaultTheme="system" attribute="class" >
-      <Geist Component={Component} pageProps={pageProps} />
-    </ThemeProvider>
+      <AnimatePresence>
+        <Geist Component={Component} pageProps={pageProps} router={router} />
+      </AnimatePresence>
+    </ThemeProvider >
   )
 }
 

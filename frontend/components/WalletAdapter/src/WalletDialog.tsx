@@ -1,8 +1,6 @@
 import { useWallet } from "../Basic/src/useWallet";
-import React, { FC, ReactElement, MouseEventHandler, SyntheticEvent, useCallback, useMemo } from 'react';
-import { useWalletDialog } from './useWalletDialog';
-import { WalletIcon } from './WalletIcon';
-import { Button, ButtonDropdown, Image, Text } from "@geist-ui/react";
+import React, { FC, ReactElement, MouseEventHandler, useCallback, useMemo } from 'react';
+import { ButtonDropdown, Image } from "@geist-ui/react";
 import { LogIn, Twitter } from "@geist-ui/react-icons";
 import { useRouter } from 'next/router'
 
@@ -18,21 +16,20 @@ export const WalletDialog: FC<WalletDialogProps> = ({ title = 'Select your walle
   disabled,
   onClick,
   ...props }) => {
-  const { wallets, select } = useWallet();
-  const { wallet, connect, disconnect, connecting, disconnecting, connected } = useWallet();
+  const { wallets, select, wallet, connect, disconnect, connecting, disconnecting, connected } = useWallet();
   const router = useRouter();
 
   const handleDisconnectClick: MouseEventHandler<HTMLButtonElement> = useCallback(
     (event) => {
       if (onClick) onClick(event);
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
       if (!event.defaultPrevented) disconnect().catch(() => { });
     },
     [onClick, disconnect]
   );
 
-  const twitter: MouseEventHandler<HTMLButtonElement> = () => {
-    router.push('https://api.hyperound.com/login/twitter')
+  const twitter: MouseEventHandler<HTMLButtonElement> = (event) => {
+    if (onClick) onClick(event);
+    if (!event.defaultPrevented) router.push('https://api.hyperound.com/login/twitter')
   }
 
   const content = useMemo(() => {
@@ -45,31 +42,6 @@ export const WalletDialog: FC<WalletDialogProps> = ({ title = 'Select your walle
   }, [children, connecting, disconnecting, connected, wallet]);
 
   return (
-    // <Dialog open={open} onClose={handleClose} className={styles.root} {...props}>
-    //     <DialogTitle>
-    //         {title}
-    //         <IconButton onClick={handleClose}>
-    //             <CloseIcon />
-    //         </IconButton>
-    //     </DialogTitle>
-    //     <DialogContent>
-    //         <List>
-    //             {wallets.map((wallet) => (
-    //                 <ListItem key={wallet.name}>
-    //                     <Button
-    //                         onClick={(event) => {
-    //                             select(wallet.name);
-    //                             handleClose(event);
-    //                         }}
-    //                         endIcon={<WalletIcon wallet={wallet} />}
-    //                     >
-    //                         {wallet.name}
-    //                     </Button>
-    //                 </ListItem>
-    //             ))}
-    //         </List>
-    //     </DialogContent>
-    // </Dialog>
     <div>
       <ButtonDropdown>
         {
@@ -103,18 +75,18 @@ export const WalletDialog: FC<WalletDialogProps> = ({ title = 'Select your walle
           </div>
         </ButtonDropdown.Item>
         {
-          wallets.map((wallet) => (
+          wallets.map((wlt) => (
             <ButtonDropdown.Item
-              key={wallet.name}
+              key={wlt.name}
               onClick={(event) => {
-                select(wallet.name);
+                select(wlt.name);
               }}>
               <div className="flex flex-row w-full pl-4">
                 <div className='w-6 bg-black rounded-full'>
-                  <Image src={wallet.icon} />
+                  <Image src={wlt.icon} />
                 </div>
                 <div className='pl-8 pr-4 h-4 right text-m'>
-                  {wallet.name}
+                  {wlt.name}
                 </div>
               </div>
             </ButtonDropdown.Item>
