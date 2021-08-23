@@ -11,6 +11,16 @@ const postSchema = new mongoose.Schema({
     type: String,
     enum: ['image', 'embed']
   },
+  favorites: {
+    count: {
+      type: Number,
+      default: 0
+    },
+    users: {
+      type: [String],
+      default: []
+    }
+  },
   locked: {
     type: Boolean,
     required: true,
