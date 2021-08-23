@@ -21,13 +21,11 @@
     "fastify-plugin": "^3.0.0",
     "fastify-swagger": "^4.9.0",
     "grant": "^5.4.16",
-    "ioredis": "^4.27.8",
     "mongoose": "^5.13.7",
     "nanoid": "^3.1.25",
     "tweetnacl": "^1.0.3"
   },
   "devDependencies": {
-    "@types/ioredis": "^4.26.7",
     "standard": "^16.0.3"
   }
 }
