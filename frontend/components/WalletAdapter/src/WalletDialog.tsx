@@ -1,8 +1,10 @@
 import { useWallet } from "../Basic/src/useWallet";
-import React, { FC, ReactElement, MouseEventHandler, useCallback, useMemo } from 'react';
+import React, { FC, ReactElement, MouseEventHandler, useCallback, useMemo, useEffect } from 'react';
 import { ButtonDropdown, Image } from "@geist-ui/react";
 import { LogIn, Twitter } from "@geist-ui/react-icons";
 import { useRouter } from 'next/router'
+import { getProvider } from "../../../helpers/SolanaProvider";
+import axios from "axios";
 
 export interface WalletDialogProps extends Omit<unknown, 'title' | 'open'> {
   title?: ReactElement;
@@ -14,6 +16,9 @@ export const WalletDialog: FC = ({
   // @ts-expect-error
   onClick
 }) => {
+
+  const provider = getProvider();
+
   const { wallets, select, wallet, disconnect, connecting, disconnecting, connected } = useWallet();
   const router = useRouter();
 
@@ -40,8 +45,33 @@ export const WalletDialog: FC = ({
     return null;
   }, [children, connecting, disconnecting, connected, wallet]);
 
+  const signLoginString = async () => {
+    // axios({
+    //   method: "get",
+    //   url: `https://api.hyperound.com/login/challenge`,
+    //   data: {
+    //     address: provider && provider.publicKey ? provider.publicKey : ""
+    //   }
+    // }).then((res: any) => {
+    //   console.log(res.data.challenge);
+    // }).catch((err: any) => {
+    //   console.error(err);
+    // })
+
+    const message = "smortboi";
+    // sign message and convert back to string
+    const data = new TextEncoder().encode(message);
+    const signedMsg = await provider.signMessage(data);
+    const signedMsgString = new TextDecoder().decode(signedMsg.signature);
+  }
+
+  useEffect(() => {
+    provider && provider.publicKey ? console.log(provider.publicKey?.toBase58()) : console.log('no public key');
+  })
+
   return (
     <div>
+      <button onClick={signLoginString} className="mr-4">Login</button>
       <ButtonDropdown>
         {
           content === 'Disconnect' ?
