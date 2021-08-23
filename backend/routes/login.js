@@ -1,4 +1,4 @@
-const { nacl } = require('tweetnacl')
+const nacl = require('tweetnacl')
 const { nanoid } = require('nanoid')
 const { User } = require('../models/user.js')
 const { Challenge } = require('../models/challenge.js')
@@ -90,11 +90,10 @@ module.exports = function (fastify, opts, done) {
       description: 'Submit challenge signature for a wallet address',
       body: {
         type: 'object',
-        required: ['address', 'signature', 'redirect'],
+        required: ['address', 'signature'],
         properties: {
           address: { type: 'string' },
-          signature: { type: 'string' },
-          redirect: { type: 'string' }
+          signature: { type: 'array' }
         }
       },
       response: {
@@ -113,7 +112,7 @@ module.exports = function (fastify, opts, done) {
       }
       if (!nacl.sign.detached.verify(
         new TextEncoder().encode(challengeQuery.challenge),
-        new TextEncoder().encode(request.body.signature),
+        request.body.signature,
         new TextEncoder().encode(request.body.address)
       )) {
         reply.code(403).send({ error: 'Invalid signature for PubKey' })
@@ -126,10 +125,10 @@ module.exports = function (fastify, opts, done) {
         })
         const userObj = await newUser.save().lean()
         request.session.user_id = userObj._id
-        reply.code(200).send({ user_id: userObj._id })
+        reply.code(200).send(userObj)
       } else {
         request.session.user_id = userQuery._id
-        reply.code(200).send({ user_id: userQuery._id })
+        reply.code(200).send(userQuery)
       }
     } catch (err) {
       fastify.log.error('❎ error:' + err)
