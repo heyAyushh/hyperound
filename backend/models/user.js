@@ -20,6 +20,30 @@ const userSchema = new mongoose.Schema({
     instagram: String,
     facebook: String,
     website: String
+  },
+  followers: {
+    count: {
+      type: Number,
+      required: true,
+      default: 0
+    },
+    users: {
+      type: [String],
+      required: true,
+      default: []
+    }
+  },
+  following: {
+    count: {
+      type: Number,
+      required: true,
+      default: 0
+    },
+    users: {
+      type: [String],
+      required: true,
+      default: []
+    }
   }
 }, {
   timestamps: true

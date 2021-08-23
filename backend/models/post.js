@@ -7,7 +7,7 @@ const postSchema = new mongoose.Schema({
   },
   text: String,
   content: String,
-  content_type: {
+  contentType: {
     type: String,
     enum: ['image', 'embed']
   },
