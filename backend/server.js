@@ -53,7 +53,7 @@ fastify.register(require('fastify-swagger'), {
     host: process.env.SWAGGER_HOST,
     schemes: ['http', 'https'],
     consumes: ['application/json'],
-    produces: ['application/json'],
+    produces: ['application/json']
   },
   uiConfig: {
     docExpansion: 'full',
@@ -71,6 +71,7 @@ fastify.get('/', async (request, reply) => {
 fastify.register(require('./helpers/authenticate'))
 fastify.register(require('./routes/login'))
 fastify.register(require('./routes/post'))
+fastify.register(require('./routes/feed'))
 
 const start = async () => {
   try {

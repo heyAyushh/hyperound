@@ -17,7 +17,7 @@ module.exports = function (fastify, opts, done) {
           locked: {
             type: 'boolean',
             default: false
-          },
+          }
         }
       },
       response: {

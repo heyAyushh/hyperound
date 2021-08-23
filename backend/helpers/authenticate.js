@@ -1,7 +1,7 @@
-const fp = require("fastify-plugin")
+const fp = require('fastify-plugin')
 const { User } = require('../models/user.js')
 
-module.exports = fp(async function(fastify, opts) {
+module.exports = fp(async function (fastify, opts) {
   fastify.decorate('authenticate', async function (request, reply) {
     try {
       if (!request.session.user_id) {
