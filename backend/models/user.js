@@ -1,19 +1,17 @@
 const mongoose = require('mongoose')
+const { nanoid } = require('nanoid')
 
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
     unique: true,
+    default: nanoid(8)
   },
   address: {
-    type: String,
-    unique: true,
+    type: String
   },
   twitter: {
-    id: {
-      type: String,
-      unique: true
-    },
+    id: String,
     screen_name: String,
     verified: Boolean
   },
@@ -27,4 +25,6 @@ const userSchema = new mongoose.Schema({
   timestamps: true
 })
 
-module.exports = { User: new mongoose.model('User', userSchema) }
+const User = mongoose.model('User', userSchema)
+
+module.exports = { User }

@@ -1,5 +1,3 @@
-import "../styles/globals.css"
-import "../styles/styles.css";
 import { GeistProvider, CssBaseline } from "@geist-ui/react"
 import { ThemeProvider, useTheme } from 'next-themes';
 import '../styles/global.css';
