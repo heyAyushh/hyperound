@@ -35,7 +35,7 @@ fastify
   }))
 
 fastify.register(require('fastify-cors'), {
-  origin: [process.env.BASE_URL, process.env.DOMAIN],
+  origin: ['*'],
   credentials: true
 })
 

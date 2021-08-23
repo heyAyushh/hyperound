@@ -61,7 +61,6 @@ module.exports = function (fastify, opts, done) {
             content: { type: 'string' },
             contentType: { type: 'string' },
             favorites: {
-              type: 'object',
               count: { type: 'number' }
             },
             createdAt: { type: 'string' },
