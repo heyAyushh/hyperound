@@ -1,0 +1,20 @@
+[package]
+name = "creator-token"
+version = "0.1.0"
+description = "Created with Anchor"
+edition = "2018"
+license = "UNLICENSED"
+
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "creator_token"
+
+[features]
+no-entrypoint = []
+cpi = ["no-entrypoint"]
+
+[dependencies]
+anchor-lang = "0.13.2"
+anchor-spl = "0.13.2"
+spl-token = "3.2.0"
