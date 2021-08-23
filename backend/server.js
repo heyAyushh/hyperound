@@ -39,9 +39,33 @@ fastify.register(require('fastify-cors'), {
   credentials: true
 })
 
+fastify.register(require('fastify-swagger'), {
+  routePrefix: '/docs',
+  swagger: {
+    info: {
+      title: 'Hyperound API Swagger',
+      description: 'Hyperound Swagger UI',
+      version: '0.1.0'
+    },
+    externalDocs: {
+      url: 'https://hyperound.com/api'
+    },
+    host: 'localhost:3000',
+    schemes: ['http', 'https'],
+    consumes: ['application/json'],
+    produces: ['application/json'],
+  },
+  uiConfig: {
+    docExpansion: 'full',
+    deepLinking: false
+  },
+  staticCSP: true,
+  transformStaticCSP: (header) => header,
+  exposeRoute: true
+})
+
 fastify.get('/', async (request, reply) => {
   reply.send('Hyperound API')
-  console.log(request.session.user_id)
 })
 
 fastify.register(require('./helpers/authenticate'))

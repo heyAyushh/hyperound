@@ -4,7 +4,11 @@ const { User } = require('../models/user.js')
 const { Challenge } = require('../models/challenge.js')
 
 module.exports = function (fastify, opts, done) {
-  fastify.get('/login/twitter/done', async (request, reply) => {
+  fastify.get('/login/twitter/done', {
+    schema: {
+      description: 'Internal endpoint to handle OAuth callback data'
+    }
+  }, async (request, reply) => {
     try {
       const twitterResponse = request.session.grant.response
       const userQuery = await User.findOne(
@@ -33,7 +37,27 @@ module.exports = function (fastify, opts, done) {
     }
   })
 
-  fastify.get('/login/wallet/challenge', async (request, reply) => {
+  fastify.get('/login/wallet/challenge', {
+    schema: {
+      description: 'Get a new challenge for a wallet address',
+      query: {
+        type: 'object',
+        required: ['address'],
+        properties: {
+          address: { type: 'string' }
+        }
+      },
+      response: {
+        200: {
+          description: 'Successful response',
+          type: 'object',
+          properties: {
+            challenge: { type: 'string' }
+          }
+        }
+      }
+    }
+  }, async (request, reply) => {
     try {
       if (!/^([A-Za-z0-9]{44})$/.test(request.query.address)) {
         reply.code(400).send({ error: 'Invalid address sent' })
@@ -61,7 +85,26 @@ module.exports = function (fastify, opts, done) {
     }
   })
 
-  fastify.get('/login/wallet/done', async (request, reply) => {
+  fastify.post('/login/wallet/done', {
+    schema: {
+      description: 'Submit challenge signature for a wallet address',
+      body: {
+        type: 'object',
+        required: ['address', 'signature', 'redirect'],
+        properties: {
+          address: { type: 'string' },
+          signature: { type: 'string' },
+          redirect: { type: 'string' }
+        }
+      },
+      response: {
+        200: {
+          description: 'Successful response',
+          type: 'object'
+        }
+      }
+    }
+  }, async (request, reply) => {
     try {
       const challengeQuery = await Challenge.findOne({ address: request.body.address }).lean()
       if (!challengeQuery) {
@@ -69,9 +112,9 @@ module.exports = function (fastify, opts, done) {
         return
       }
       if (!nacl.sign.detached.verify(
-        request.body.challenge,
-        request.body.signature,
-        request.body.address
+        new TextEncoder().encode(challengeQuery.challenge),
+        new TextEncoder().encode(request.body.signature),
+        new TextEncoder().encode(request.body.address)
       )) {
         reply.code(403).send({ error: 'Invalid signature for PubKey' })
         return
@@ -81,12 +124,13 @@ module.exports = function (fastify, opts, done) {
         const newUser = new User({
           address: request.body.address
         })
-        const userObj = await newUser.save()
+        const userObj = await newUser.save().lean()
         request.session.user_id = userObj._id
+        reply.code(200).send({ user_id: userObj._id })
       } else {
         request.session.user_id = userQuery._id
+        reply.code(200).send({ user_id: userQuery._id })
       }
-      reply.sendStatus(200)
     } catch (err) {
       fastify.log.error('❎ error:' + err)
       if (!reply.sent) {

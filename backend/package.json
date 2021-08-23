@@ -19,6 +19,7 @@
     "fastify-oauth2": "^4.2.3",
     "fastify-passport": "^0.4.3",
     "fastify-plugin": "^3.0.0",
+    "fastify-swagger": "^4.9.0",
     "grant": "^5.4.16",
     "ioredis": "^4.27.8",
     "mongoose": "^5.13.7",
