@@ -8,8 +8,17 @@ const Geist = ({ Component, pageProps }) => {
 
   let { theme } = useTheme();
 
+  const ISSERVER = typeof window === "undefined";
+
+  if (ISSERVER) {
+    return (
+      <>
+      </>
+    )
+  }
+
   return (
-    <GeistProvider themeType={theme? theme: 'light'}>
+    <GeistProvider themeType={theme}>
       <CssBaseline />
       <Component {...pageProps} />
     </GeistProvider>
@@ -19,7 +28,7 @@ const Geist = ({ Component, pageProps }) => {
 function MyApp({ Component, pageProps }) {
 
   return (
-    <ThemeProvider defaultTheme="light" attribute="class" >
+    <ThemeProvider defaultTheme="system" attribute="class" >
       <Geist Component={Component} pageProps={pageProps} />
     </ThemeProvider>
   )

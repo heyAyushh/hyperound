@@ -1,7 +1,6 @@
 import { Wallet } from "../wallets/src/wallets";
 import React, { DetailedHTMLProps, FC, ImgHTMLAttributes } from 'react';
 
-
 export interface WalletIconProps extends DetailedHTMLProps<ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement> {
     wallet?: Wallet;
 }
