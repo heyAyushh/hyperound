@@ -50,7 +50,7 @@ fastify.register(require('fastify-swagger'), {
     externalDocs: {
       url: 'https://hyperound.com/api'
     },
-    host: 'localhost:3000',
+    host: process.env.SWAGGER_HOST,
     schemes: ['http', 'https'],
     consumes: ['application/json'],
     produces: ['application/json'],
