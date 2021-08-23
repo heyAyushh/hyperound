@@ -13,7 +13,7 @@ module.exports = function (fastify, opts, done) {
           creator: { type: 'string' },
           text: { type: 'string' },
           content: { type: 'string' },
-          content_type: { type: 'string' },
+          contentType: { type: 'string' },
           locked: {
             type: 'boolean',
             default: false
@@ -36,7 +36,7 @@ module.exports = function (fastify, opts, done) {
         creator: mongoose.Types.ObjectId(request.body.creator),
         text: request.body.text,
         content: request.body.content,
-        content_type: request.body.content_type,
+        contentType: request.body.contentType,
         locked: request.body.locked
       })
       reply.code(201).send()

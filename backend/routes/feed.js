@@ -37,6 +37,56 @@ module.exports = function (fastify, opts, done) {
     }
   })
 
+  fastify.get('/feed/latest/polling', {
+    schema: {
+      description: 'Fetch the latest post after a point in time',
+      query: {
+        type: 'object',
+        properties: {
+          date: {
+            description: 'Get posts newer than given date',
+            type: 'string'
+          }
+        }
+      },
+      response: {
+        200: {
+          description: 'Successful response',
+          type: 'object',
+          properties: {
+            _id: { type: 'string' },
+            locked: { type: 'boolean' },
+            creator: { type: 'string' },
+            text: { type: 'string' },
+            content: { type: 'string' },
+            contentType: { type: 'string' },
+            favorites: {
+              type: 'object',
+              count: { type: 'number' }
+            },
+            createdAt: { type: 'string' },
+            updatedAt: { type: 'string' },
+          }
+        }
+      }
+    }
+  }, async (request, reply) => {
+    try {
+      const feedQuery = await Post.findOne(
+        {
+          locked: false,
+          updatedAt: { $gt: request.query.date  }
+        }, { __v: 0, 'favorites.users': 0 })
+        .sort({ updatedAt: 'desc' }).lean()
+      reply.send(feedQuery)
+    } catch (err) {
+      fastify.log.error('❎ error:' + err)
+      if (!reply.sent) {
+        reply.code(400).send()
+      }
+    }
+  })
+
   fastify.get('/feed/trending', {
     schema: {
       description: 'Fetch top 10 trending posts in the past week',

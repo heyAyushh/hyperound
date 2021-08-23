@@ -72,6 +72,7 @@ fastify.register(require('./helpers/authenticate'))
 fastify.register(require('./routes/login'))
 fastify.register(require('./routes/post'))
 fastify.register(require('./routes/feed'))
+fastify.register(require('./routes/profile'))
 
 const start = async () => {
   try {
