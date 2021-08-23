@@ -56,7 +56,7 @@ fastify.register(require('fastify-swagger'), {
     produces: ['application/json']
   },
   uiConfig: {
-    docExpansion: 'full',
+    docExpansion: 'none',
     deepLinking: false
   },
   staticCSP: true,
