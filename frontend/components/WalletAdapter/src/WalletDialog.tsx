@@ -52,10 +52,15 @@ export const WalletDialog: FC = ({
     })
 
     const data = new TextEncoder().encode(challenge_req.data.challenge);
+    // const data = new TextEncoder().encode("hello");
     const signedMsg = await provider.signMessage(data);
     const signature_array = [...signedMsg.signature];
     console.log(signature_array);
     const signedMsgString = new TextDecoder().decode(signedMsg.signature);
+
+    console.log(challenge_req.data.challenge);
+    console.log(provider ? provider.publicKey?.toBase58() : "");
+    console.log(signature_array);
 
     try {
       // console.log(provider.publicKey)
@@ -67,6 +72,8 @@ export const WalletDialog: FC = ({
           signature: signature_array
         }
       });
+
+      console.log(done_req);
     } catch (error) {
       console.error(error);
     }
