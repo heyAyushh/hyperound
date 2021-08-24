@@ -1,3 +1,4 @@
+const mongoose = require('mongoose')
 const nacl = require('tweetnacl')
 const { nanoid } = require('nanoid')
 const { User } = require('../models/user.js')
@@ -91,7 +92,7 @@ module.exports = function (fastify, opts, done) {
       description: 'Submit challenge signature for a wallet address',
       body: {
         type: 'object',
-        required: ['address', 'signature'],
+        required: ['address'],
         properties: {
           address: { type: 'string' },
           signature: { type: 'array' }
@@ -111,26 +112,46 @@ module.exports = function (fastify, opts, done) {
         reply.code(400).send({ error: 'Non-existent challenge' })
         return
       }
-      const pubKey = new PublicKey(request.body.address).encode()
+      const pubKeyBytes = new PublicKey(request.body.address).toBytes()
       if (!nacl.sign.detached.verify(
         new TextEncoder().encode(challengeQuery.challenge),
         new Uint8Array(request.body.signature),
-        new Uint8Array(pubKey)
+        pubKeyBytes
       )) {
         reply.code(403).send({ error: 'Invalid signature for PubKey' })
         return
       }
-      const userQuery = await User.findOne({ address: request.body.address }).lean()
-      if (!userQuery) {
-        const newUser = new User({
-          address: request.body.address
-        })
-        const userObj = await newUser.save().lean()
-        request.session.user_id = userObj._id
-        reply.code(200).send(userObj)
+      if (!request.session.user_id) {
+        // if session has no user_id, uses wallet as login
+        const userQuery = await User.findOne({ address: request.body.address }).lean()
+        if (!userQuery) {
+          // if no user exists, register a new one with address and provide a cookie
+          const newUser = new User({
+            address: request.body.address
+          })
+          const userObj = await newUser.save()
+          request.session.user_id = userObj._id
+          reply.send(userObj)
+        } else {
+          // user exists, provide a cookie
+          request.session.user_id = userQuery._id
+          reply.send(userQuery)
+        }
       } else {
-        request.session.user_id = userQuery._id
-        reply.code(200).send(userQuery)
+        // if session has user_id, uses wallet as login or for connecting accounts
+        const userQuery = await User.findOne({ _id: mongoose.Types.ObjectId(request.session.user_id) })
+        if (!userQuery) {
+          request.session.user_id = undefined // who is this?!
+          reply.code(403).send()
+        } else {
+          // increase existing cookie age to maxAge
+          const updatedUser = await User.updateOne(
+            { _id: mongoose.Types.ObjectId(request.session.user_id) },
+            { address: request.body. address}
+          )
+          request.session.touch()
+          reply.send(userQuery)
+        }
       }
     } catch (err) {
       fastify.log.error('❎ error:' + err)
