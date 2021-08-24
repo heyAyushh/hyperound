@@ -29,7 +29,7 @@ module.exports = function (fastify, opts, done) {
             },
             following: {
               count: { type: 'number' }
-            },
+            }
           }
         },
         404: {

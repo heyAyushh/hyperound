@@ -44,7 +44,6 @@ module.exports = function (fastify, opts, done) {
         type: 'object',
         properties: {
           date: {
-            description: 'Get posts newer than given date',
             type: 'string'
           }
         }

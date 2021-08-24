@@ -2,6 +2,7 @@ const nacl = require('tweetnacl')
 const { nanoid } = require('nanoid')
 const { User } = require('../models/user.js')
 const { Challenge } = require('../models/challenge.js')
+const { PublicKey } = require('@solana/web3.js')
 
 module.exports = function (fastify, opts, done) {
   fastify.get('/login/twitter/done', {
@@ -110,10 +111,11 @@ module.exports = function (fastify, opts, done) {
         reply.code(400).send({ error: 'Non-existent challenge' })
         return
       }
+      const pubKey = new PublicKey(request.body.address).encode()
       if (!nacl.sign.detached.verify(
         new TextEncoder().encode(challengeQuery.challenge),
         new Uint8Array(request.body.signature),
-        new TextEncoder().encode(request.body.address)
+        new Uint8Array(pubKey)
       )) {
         reply.code(403).send({ error: 'Invalid signature for PubKey' })
         return
