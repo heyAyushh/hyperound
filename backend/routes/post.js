@@ -29,8 +29,9 @@ module.exports = function (fastify, opts, done) {
     }
   }, async (request, reply) => {
     try {
-      if (request.body.creator !== request.session.user_id) {
+      if (request.body.creator !== String(request.session.user_id)) {
         reply.code(403).send()
+        return
       }
       const newPost = await Post.create({
         creator: mongoose.Types.ObjectId(request.body.creator),
@@ -48,15 +49,15 @@ module.exports = function (fastify, opts, done) {
     }
   })
 
-  fastify.patch('/favorite', {
+  fastify.post('/favorite/:postId', {
     preValidation: [fastify.authenticate],
     schema: {
-      description: 'Toggles the favourite state on a post for a particular user',
-      body: {
+      description: 'Adds favorite status on a post for a particular user',
+      params: {
         type: 'object',
-        required: ['id'],
+        required: ['postId'],
         properties: {
-          id: { type: 'string' }
+          postId: { type: 'string' }
         }
       },
       response: {
@@ -68,24 +69,57 @@ module.exports = function (fastify, opts, done) {
     }
   }, async (request, reply) => {
     try {
-      const post = await Post.findOne({ _id: request.body.id })
+      const post = await Post.findById(request.params.postId)
       if (!post) {
         reply.code(404).send()
+        return
+      } else {
+        if (!post.favorites.users.includes(request.session.user_id)) {
+          await Post.findByIdAndUpdate(request.params.postId, {
+            $inc: { 'favorites.count': 1 },
+            $push: { 'favorites.users': request.session.user_id }
+          })
+        }
+      }
+      reply.send()
+    } catch (err) {
+      fastify.log.error('❎ error:' + err)
+      if (!reply.sent) {
+        reply.code(400).send()
+      }
+    }
+  })
+
+  fastify.delete('/favorite/:postId', {
+    preValidation: [fastify.authenticate],
+    schema: {
+      description: 'Removes favorite status on a post for a particular user',
+      params: {
+        type: 'object',
+        required: ['postId'],
+        properties: {
+          postId: { type: 'string' }
+        }
+      },
+      response: {
+        200: {
+          description: 'Successful response',
+          type: 'object'
+        }
+      }
+    }
+  }, async (request, reply) => {
+    try {
+      const post = await Post.findById(request.params.postId)
+      if (!post) {
+        reply.code(404).send()
+        return
       } else {
         if (post.favorites.users.includes(request.session.user_id)) {
-          await Post.updateOne(
-            { _id: request.body.id },
-            {
-              $inc: { 'favorites.count': -1 },
-              $pull: { 'favorites.users': request.session.user_id }
-            })
-        } else {
-          await Post.updateOne(
-            { _id: request.body.id },
-            {
-              $inc: { 'favorites.count': 1 },
-              $push: { 'favorites.users': request.session.user_id }
-            })
+          await Post.findByIdAndUpdate(request.params.postId, {
+            $inc: { 'favorites.count': -1 },
+            $pull: { 'favorites.users': request.session.user_id }
+          })
         }
       }
       reply.send()
