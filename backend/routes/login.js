@@ -1,4 +1,3 @@
-const mongoose = require('mongoose')
 const nacl = require('tweetnacl')
 const { nanoid } = require('nanoid')
 const { User } = require('../models/user.js')
@@ -74,15 +73,14 @@ module.exports = function (fastify, opts, done) {
           reply.send(userObj)
         } else {
           // check if user_id exists
-          const idQuery = await User.findOne({ _id: mongoose.Types.ObjectId(request.session.user_id) })
+          const idQuery = await User.findById(request.session.user_id)
           if (!idQuery) {
             request.session.user_id = undefined // who is this?!
             reply.code(403).send()
             return
           }
           // user exists, connect account with twitter
-          const updatedUser = await User.updateOne(
-            { _id: mongoose.Types.ObjectId(request.session.user_id) },
+          const updatedUser = await User.findByIdAndUpdate(request.session.user_id,
             { 'twitter.id': twitterResponse.raw.user_id }
           )
           request.session.touch()
@@ -231,15 +229,14 @@ module.exports = function (fastify, opts, done) {
           reply.send(userObj)
         } else {
           // check if user_id is valid
-          const idQuery = await User.findOne({ _id: mongoose.Types.ObjectId(request.session.user_id) })
+          const idQuery = await User.findById(request.session.user_id)
           if (!idQuery) {
             request.session.user_id = undefined // who is this?!
             reply.code(403).send()
             return
           }
           // user exists, connect wallet to account
-          const updatedUser = await User.updateOne(
-            { _id: mongoose.Types.ObjectId(request.session.user_id) },
+          const updatedUser = await User.findByIdAndUpdate(request.session.user_id,
             { address: request.body.address }
           )
           request.session.touch()
