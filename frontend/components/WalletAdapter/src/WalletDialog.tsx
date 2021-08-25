@@ -1,8 +1,10 @@
 import { useWallet } from "../Basic/src/useWallet";
-import React, { FC, ReactElement, MouseEventHandler, useCallback, useMemo } from 'react';
+import React, { FC, ReactElement, MouseEventHandler, useCallback, useMemo, useEffect } from 'react';
 import { ButtonDropdown, Image } from "@geist-ui/react";
 import { LogIn, Twitter } from "@geist-ui/react-icons";
 import { useRouter } from 'next/router'
+import { getProvider } from "../../../helpers/SolanaProvider";
+import axios from "axios";
 
 export interface WalletDialogProps extends Omit<unknown, 'title' | 'open'> {
   title?: ReactElement;
@@ -14,6 +16,9 @@ export const WalletDialog: FC = ({
   // @ts-expect-error
   onClick
 }) => {
+
+  const provider = getProvider();
+
   const { wallets, select, wallet, disconnect, connecting, disconnecting, connected } = useWallet();
   const router = useRouter();
 
@@ -40,8 +45,43 @@ export const WalletDialog: FC = ({
     return null;
   }, [children, connecting, disconnecting, connected, wallet]);
 
+  const signLoginString = async () => {
+    const challenge_req = await axios({
+      method: "get",
+      url: `https://api.hyperound.com/login/wallet/challenge?address=${provider && provider.publicKey ? provider.publicKey : ""}`
+    })
+
+    const data = new TextEncoder().encode(challenge_req.data.challenge);
+    // const data = new TextEncoder().encode("hello");
+    const signedMsg = await provider.signMessage(data);
+    const signature_array = [...signedMsg.signature];
+    console.log(signature_array);
+    const signedMsgString = new TextDecoder().decode(signedMsg.signature);
+
+    console.log(challenge_req.data.challenge);
+    console.log(provider ? provider.publicKey?.toBase58() : "");
+    console.log(signature_array);
+
+    try {
+      // console.log(provider.publicKey)
+      const done_req = await axios({
+        method: "post",
+        url: `https://api.hyperound.com/login/wallet/done`,
+        data: {
+          address: provider ? provider.publicKey?.toBase58() : "",
+          signature: signature_array
+        }
+      });
+
+      console.log(done_req);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   return (
     <div>
+      <button onClick={signLoginString} className="mr-4">Login</button>
       <ButtonDropdown>
         {
           content === 'Disconnect' ?
