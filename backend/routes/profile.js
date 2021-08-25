@@ -19,16 +19,37 @@ module.exports = function (fastify, opts, done) {
           properties: {
             _id: { type: 'string' },
             username: { type: 'string' },
+            address: { type: 'string' },
             twitter: {
-              screen_name: { type: 'string' },
-              verified: { type: 'boolean' },
+              type: 'object',
+              properties: {
+                id: { type: 'string' },
+                screen_name: { type: 'string' },
+                verified: { type: 'string' }
+              }
             },
-            createdAt: { type: 'string' },
+            socials: {
+              type: 'object',
+              properties: {
+                twitter: { type: 'string' },
+                instagram: { type: 'string' },
+                facebook: { type: 'string' },
+                website: { type: 'string' }
+              }
+            },
             followers: {
-              count: { type: 'number' }
+              type: 'object',
+              properties: {
+                count: { type: 'number' },
+                users: { type: 'array' }
+              }
             },
             following: {
-              count: { type: 'number' }
+              type: 'object',
+              properties: {
+                count: { type: 'number' },
+                users: { type: 'array' }
+              }
             }
           }
         },
@@ -42,7 +63,7 @@ module.exports = function (fastify, opts, done) {
     try {
       const userQuery = await User.findOne(
         { _id: mongoose.Types.ObjectId(request.params.userId) },
-        { __v: 0, "followers.users": 0, "following.users": 0 })
+        { __v: 0, 'followers.users': 0, 'following.users': 0 })
         .lean()
       if (!userQuery) {
         reply.code(404).send()
