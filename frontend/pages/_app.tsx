@@ -2,6 +2,7 @@ import { GeistProvider, CssBaseline } from "@geist-ui/react"
 import { ThemeProvider, useTheme } from 'next-themes';
 import { motion, AnimatePresence } from 'framer-motion';
 import '../styles/global.css';
+import Cursor from "../components/cursor";
 
 const Geist = ({ Component, pageProps, router }) => {
 
@@ -37,6 +38,7 @@ const Geist = ({ Component, pageProps, router }) => {
         }
       }}>
         <Component {...pageProps} />
+        <Cursor />
       </motion.div>
     </GeistProvider>
   )
