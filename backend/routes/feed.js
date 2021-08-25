@@ -63,7 +63,7 @@ module.exports = function (fastify, opts, done) {
               type: 'object',
               properties: {
                 count: { type: 'number' }
-              }g
+              }
             },
             createdAt: { type: 'string' },
             updatedAt: { type: 'string' }
