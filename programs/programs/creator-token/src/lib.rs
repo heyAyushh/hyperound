@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 #[allow(unused_imports)]
 use anchor_spl::token::{self, MintTo, Burn, Transfer, InitializeMint, SetAuthority, InitializeAccount, Mint};
+use serde::{Serialize, Deserialize};
 
 #[program]
 mod creator_token {
@@ -10,9 +11,15 @@ mod creator_token {
         Ok(())
     }
 
-    pub fn initialize_token_mint(_ctx: Context<InitializeTokenMint>, decimals:u8, authority: Pubkey, freeze_authority: Option<Pubkey>) -> ProgramResult {
-        // anchor_spl::token::initialize_mint(_ctx.into(), decimals, &authority, freeze_authority)
-        Ok(())
+    pub fn initialize_token_mint(_ctx: Context<InitializeTokenMint>, decimals:u8, authority: Pubkey, freeze_authority: Pubkey) -> ProgramResult {
+        let cpi_accounts = InitializeMint {
+            mint: _ctx.accounts.mint.clone(),
+            rent: _ctx.accounts.rent.clone(),
+        };
+        let cpi_program = _ctx.accounts.token_program.clone();
+        let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
+        
+        anchor_spl::token::initialize_mint(cpi_ctx, decimals, &authority, Some(&freeze_authority))
     }
 
     pub fn initialize_token_account(_ctx: Context<InitializeTokenAccount>) -> ProgramResult {
@@ -34,6 +41,11 @@ mod creator_token {
     pub fn set_authority(_ctx: Context<SetCreatorAuthority>, authority_type: AuthorityType, new_authority: Option<Pubkey>) -> ProgramResult {
         anchor_spl::token::set_authority(_ctx.accounts.into(), authority_type.into(), new_authority)
     }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct TokenState {
+    pub n: u8
 }
 
 #[derive(Accounts)]

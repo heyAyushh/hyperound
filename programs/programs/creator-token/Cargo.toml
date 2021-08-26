@@ -18,3 +18,4 @@ cpi = ["no-entrypoint"]
 anchor-lang = "0.13.2"
 anchor-spl = "0.13.2"
 spl-token = "3.2.0"
+serde = "1.0.129"
