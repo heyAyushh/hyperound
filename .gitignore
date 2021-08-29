@@ -1,4 +1,6 @@
 learn-web3-dapp/
+ts/
+.history
 
 # Logs
 logs
