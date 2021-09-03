@@ -25,7 +25,7 @@ module.exports = function (fastify, opts, done) {
       const feedQuery = await Post.find(
         {
           locked: false,
-          updatedAt: { $lt: request.query.date ?? Date.now() }
+          updatedAt: { $lt: request.query.date || Date.now() }
         }, { __v: 0, 'favorites.users': 0 })
         .sort({ updatedAt: 'desc' }).limit(10).lean()
       reply.send(feedQuery)
@@ -112,7 +112,7 @@ module.exports = function (fastify, opts, done) {
       const feedQuery = await Post.find(
         {
           locked: false,
-          updatedAt: { $lt: request.query.date ?? Date.now(), $gte: Date.now() - 604800000 } // last 1 week
+          updatedAt: { $lt: request.query.date || Date.now(), $gte: Date.now() - 604800000 } // last 1 week
         }, { __v: 0, 'favorites.users': 0 })
         .sort({ 'favorites.count': 'desc' }).limit(10).lean()
       reply.send(feedQuery)
