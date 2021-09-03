@@ -19,7 +19,7 @@ export const WalletDialog: FC = ({
 
   const provider = getProvider();
 
-  const { wallets, select, wallet, disconnect, connecting, disconnecting, connected } = useWallet();
+  const { wallets, select, wallet, disconnect, connecting, disconnecting, connected, autoConnect,  } = useWallet();
   const router = useRouter();
 
   const handleDisconnectClick: MouseEventHandler<HTMLButtonElement> = useCallback(
@@ -81,7 +81,6 @@ export const WalletDialog: FC = ({
 
   return (
     <div>
-      <button onClick={signLoginString} className="mr-4">Login</button>
       <ButtonDropdown>
         {
           content === 'Disconnect' ?
@@ -117,8 +116,9 @@ export const WalletDialog: FC = ({
           wallets.map((wlt) => (
             <ButtonDropdown.Item
               key={wlt.name}
-              onClick={() => {
+              onClick={async () => {
                 select(wlt.name);
+                await signLoginString();
               }}>
               <div className="flex flex-row w-full pl-4">
                 <div className='w-6 bg-black rounded-full'>
