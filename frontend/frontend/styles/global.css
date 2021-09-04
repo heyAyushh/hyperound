@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  cursor: crosshair;
+}
+
+.cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  border: dashed;
+  border-color: white;
+  @apply dark:border-black;
+  background-color: white;
+  mix-blend-mode: difference;
+  z-index: 999;
+  pointer-events: none;
+}
+
+.canvas {
+  display: block;
+  image-rendering: pixelated;
+}
