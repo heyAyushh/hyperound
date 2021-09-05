@@ -1,9 +1,11 @@
 import { atom } from "recoil";
 
-export const userState = atom({
+export const tokenState = atom({
   key: 'tokenState',
   default: {
     exists: false,
-    address: 'null',
+    signature: '',
+    transaction: {},
+    mint: {}
   },
 });

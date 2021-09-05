@@ -27,7 +27,6 @@ export default function LoggedIn(): JSX.Element {
   const getUrl = () => {
     const url = 'https://avatars.dicebear.com/api/' + (getRandomInt(2) ? 'male/' : 'female/') + makeid(5) + '.svg';
 
-    console.log(url);
     return url;
   }
 
