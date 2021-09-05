@@ -1,4 +1,4 @@
-import { Page } from "@geist-ui/react";
+import { Page, Spacer } from "@geist-ui/react";
 import { useRouter } from 'next/router';
 import Header from "../../components/header";
 
@@ -12,7 +12,8 @@ export default function Post(): JSX.Element {
       <Page.Header>
         <Header />
       </Page.Header>
-      <h1>Toggle your Settings</h1>
+      <Spacer h={7} />
+      <h1>Toggle your settings here.</h1>
     </Page>
   )
 }

@@ -6,10 +6,10 @@ import React, { FC, ReactNode, useCallback, useEffect, useMemo, useState } from 
 import { WalletNotSelectedError } from './errors';
 import { useLocalStorage } from './useLocalStorage';
 import { WalletContext } from './useWallet';
-import { Button, Spacer, useToasts } from "@geist-ui/react";
+import { useToasts } from "@geist-ui/react";
 import axios from "axios";
 import { getProvider } from "../../../../helpers/SolanaProvider";
-import { loggedInState } from "../../../../store/loggedIn";
+import { loggedInState, loggedInWalletState } from "../../../../store/loggedIn";
 import { useRecoilState } from "recoil";
 
 export interface WalletProviderProps {
@@ -47,6 +47,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
     const [autoApprove, setAutoApprove] = useState(false);
     const [publicKey, setPublicKey] = useState<PublicKey | null>(null);
     const [loggedIn, setLoggedin] = useRecoilState(loggedInState);
+    const [loggedInWallet, setloggedInWallet] = useRecoilState(loggedInWalletState);
 
     const walletsByName = useMemo(
       () =>
@@ -81,7 +82,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
     const signLoginString = async () => {
       const [provider, loggedInAlready] = getProvider();
 
-      if (provider && !loggedInAlready) {
+      if (provider && !loggedIn) {
         const challenge_req = await axios({
           method: "get",
           url: `https://api.hyperound.com/login/wallet/challenge?address=${provider && provider.publicKey ? provider.publicKey : ""}`
@@ -92,14 +93,14 @@ export const WalletProvider: FC<WalletProviderProps> = ({
         const signedMsg = await provider.signMessage(data);
         const signature_array = [...signedMsg.signature];
         // console.log(signature_array);
-        const signedMsgString = new TextDecoder().decode(signedMsg.signature);
+        // const signedMsgString = new TextDecoder().decode(signedMsg.signature);
 
         // console.log(challenge_req.data.challenge);
         // console.log(provider ? provider.publicKey?.toBase58() : "");
         // console.log(signature_array);
         // console.log(provider.publicKey);
 
-        const done_req = await axios({
+        await axios({
           method: "post",
           url: `https://api.hyperound.com/login/wallet/done`,
           data: {
@@ -108,8 +109,16 @@ export const WalletProvider: FC<WalletProviderProps> = ({
           }
         });
 
-        localStorage.setItem('verifiedWallet', 'true');
-        console.log(done_req);
+        setLoggedin(true);
+        setloggedInWallet({
+          publicKey: provider.publicKey?.toBase58(),
+          provider: provider?.isPhantom,
+          verified: true,
+        })
+        setToast({
+          text: 'Connected Successfully!',
+          type: 'success'
+        })
       }
     }
 
@@ -179,10 +188,16 @@ export const WalletProvider: FC<WalletProviderProps> = ({
           text: 'Disconnected Successfully!',
           type: 'success',
         })
-        localStorage.setItem('verifiedWallet', 'false');
+
+        setLoggedin(false);
+        setloggedInWallet({
+          verified: false,
+          publicKey: null,
+          provider: null
+        });
         await select(null);
       }
-    }, [disconnecting, adapter, select, setDisconnecting, setToast]);
+    }, [disconnecting, adapter, select, setDisconnecting, setToast, setLoggedin, setloggedInWallet]);
 
     const signTransaction = useCallback(
       async (transaction: Transaction) => {
@@ -217,7 +232,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
 
         return await adapter.signAllTransactions(transactions);
       },
-      [adapter, onError, connected]
+      [adapter, onError, connected, setToast]
     );
 
     // Reset state and set the wallet, adapter, and ready state when the name changes

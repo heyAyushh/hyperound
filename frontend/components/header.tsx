@@ -62,7 +62,6 @@ const Header = (): JSX.Element => {
               <Spacer h={5} />
               <div> <ThemeSwitch /> </div>
               <Spacer h={5} />
-
             </div>
           </Drawer.Content>
         </Drawer>

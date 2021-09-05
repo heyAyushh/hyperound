@@ -17,8 +17,6 @@ export const WalletDialog: FC = ({
   onClick
 }) => {
 
-  const provider = getProvider();
-
   const { wallets, select, wallet, disconnect, connecting, disconnecting, connected, autoConnect } = useWallet();
   const router = useRouter();
 
