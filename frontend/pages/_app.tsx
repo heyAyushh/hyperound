@@ -6,6 +6,8 @@ import Cursor from "../components/cursor";
 import {
   RecoilRoot,
 } from 'recoil';
+import { HMSRoomProvider, HMSThemeProvider } from "@100mslive/hms-video-react";
+import { Disconnect } from "../components/Live/Disconnect";
 
 const Geist = ({ Component, pageProps, router }) => {
 
@@ -21,29 +23,34 @@ const Geist = ({ Component, pageProps, router }) => {
   }
 
   return (
-    <GeistProvider themeType={theme}>
-      <CssBaseline />
-      <motion.div key={router.route} initial="pageInitial" animate="pageAnimate" exit="pageExit" variants={{
-        pageInitial: {
-          opacity: 0
-        },
-        pageAnimate: {
-          opacity: 1
-        },
-        pageExit: {
-          // filter: [
-          //   'hue-rotate(0) contrast(100%)',
-          //   'hue-rotate(360deg) contrast(200%)',
-          //   'hue-rotate(45deg) contrast(300%)',
-          //   'hue-rotate(0) contrast(100%)'
-          // ],
-          opacity: 0
-        }
-      }}>
-        <Component {...pageProps} />
-        <Cursor />
-      </motion.div>
-    </GeistProvider>
+    <HMSRoomProvider>
+      <HMSThemeProvider config={{}} appBuilder={{theme: "dark"}}>
+        <GeistProvider themeType={theme}>
+          <CssBaseline />
+          <Disconnect />
+          <motion.div key={router.route} initial="pageInitial" animate="pageAnimate" exit="pageExit" variants={{
+            pageInitial: {
+              opacity: 0
+            },
+            pageAnimate: {
+              opacity: 1
+            },
+            pageExit: {
+              // filter: [
+              //   'hue-rotate(0) contrast(100%)',
+              //   'hue-rotate(360deg) contrast(200%)',
+              //   'hue-rotate(45deg) contrast(300%)',
+              //   'hue-rotate(0) contrast(100%)'
+              // ],
+              opacity: 0
+            }
+          }}>
+            <Component {...pageProps} />
+            <Cursor />
+          </motion.div>
+        </GeistProvider>
+      </HMSThemeProvider>
+    </HMSRoomProvider>
   )
 }
 
