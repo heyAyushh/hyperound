@@ -2,13 +2,13 @@ import Link from 'next/link'
 import ThemeSwitch from './themeSwitcher'
 import { Layers } from '@geist-ui/react-icons'
 import { Wallet } from "./WalletAdapter/Wallet"
-import React from "react"
+import React, { useEffect } from "react"
 import { Button, Drawer, Spacer } from "@geist-ui/react"
 import { Sidebar } from '@geist-ui/react-icons'
-import Image from "next/image"
+import LoggedIn from "./LoggedIn"
 
 const Header = (): JSX.Element => {
-  const [state, setState] = React.useState(false)
+  const [state, setState] = React.useState(false);
 
   const Brand = () => (
     <Link href="/" passHref>
@@ -35,8 +35,11 @@ const Header = (): JSX.Element => {
           <div className="pr-8 ">
             <Wallet />
           </div>
-          <div className=" ">
+          <div className="pr-8 ">
             <ThemeSwitch />
+          </div>
+          <div>
+            <LoggedIn />
           </div>
         </div>
       </div>

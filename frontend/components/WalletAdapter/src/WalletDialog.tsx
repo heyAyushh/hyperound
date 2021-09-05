@@ -5,6 +5,7 @@ import { LogIn, Twitter } from "@geist-ui/react-icons";
 import { useRouter } from 'next/router'
 import { getProvider } from "../../../helpers/SolanaProvider";
 import axios from "axios";
+import { WalletName } from "../wallets/src";
 
 export interface WalletDialogProps extends Omit<unknown, 'title' | 'open'> {
   title?: ReactElement;
@@ -16,7 +17,6 @@ export const WalletDialog: FC = ({
   // @ts-expect-error
   onClick
 }) => {
-
   const { wallets, select, wallet, disconnect, connecting, disconnecting, connected, autoConnect } = useWallet();
   const router = useRouter();
 
@@ -57,7 +57,7 @@ export const WalletDialog: FC = ({
               </div>
             </ButtonDropdown.Item>
             :
-            <ButtonDropdown.Item main onClick={twitter}>
+            <ButtonDropdown.Item main onClick={(e) => select('Phantom' as WalletName)}>
               <div className='flex flex-row'>
                 <LogIn size={20} />
                 <div className='pl-8 pr-4 h-4 right text-m'>
