@@ -3,26 +3,32 @@ import ThemeSwitch from './themeSwitcher'
 import { Layers } from '@geist-ui/react-icons'
 import { Wallet } from "./WalletAdapter/Wallet"
 import React from "react"
-import { Button, Drawer } from "@geist-ui/react"
+import { Button, Drawer, Spacer } from "@geist-ui/react"
+import { Sidebar } from '@geist-ui/react-icons'
+import Image from "next/image"
 
 const Header = (): JSX.Element => {
   const [state, setState] = React.useState(false)
 
+  const Brand = () => (
+    <Link href="/" passHref>
+      <div className="flex flex-row items-baseline">
+        <div className="pr-4">
+          <Layers />
+        </div>
+        <div>
+          <h3 className="hover:underline text">hyperound</h3>
+        </div>
+      </div>
+    </Link>
+  );
+
   return (
     <>
-      {/* For Desktops
-      <div className="flex flex-row justify-between items-center py-2 mt-4 mb-10 w-full backdrop-blur-3xl md:block">
+      {/* For Desktops */}
+      <div className="hidden sm:flex flex-row justify-between items-center py-2 mt-4 mb-10 w-full backdrop-blur-3xl">
         <h2 className="text-2xl md:text-4xl font-bold tracking-tight md:tracking-tighter leading-tight">
-          <Link href="/" passHref>
-            <div className="flex flex-row items-baseline">
-              <div className="pr-4">
-                <Layers />
-              </div>
-              <div>
-                <h3 className="hover:underline text">hyperound</h3>
-              </div>
-            </div>
-          </Link>
+          <Brand />
         </h2>
 
         <div className="flex flex-row ">
@@ -33,16 +39,31 @@ const Header = (): JSX.Element => {
             <ThemeSwitch />
           </div>
         </div>
-      </div> */}
+      </div>
 
       {/* For Mobiles */}
-      <div>
-        <Button auto onClick={() => setState(true)} scale={1 / 2}>Show Drawer</Button>
+      <div className="sm:hidden ">
+        <div className="flex flex-row w-full justify-around items-baseline">
+          <div>
+            <Brand />
+          </div>
+          <div>
+            <Spacer w={5} />
+          </div>
+          <Button iconRight={<Sidebar />} auto scale={1} px={0.6} onClick={() => setState(true)} />
+        </div>
         <Drawer visible={state} onClose={() => setState(false)} placement="right">
-          <Drawer.Title>Drawer</Drawer.Title>
-          <Drawer.Subtitle>This is a drawer</Drawer.Subtitle>
+          <Drawer.Title>Hyperound.</Drawer.Title>
+          <Drawer.Subtitle></Drawer.Subtitle>
           <Drawer.Content>
-            <p>Some content contained within the drawer.</p>
+            <div className="flex flex-col justify-items-center">
+              <Spacer h={5} />
+              <div> <Wallet /> </div>
+              <Spacer h={5} />
+              <div> <ThemeSwitch /> </div>
+              <Spacer h={5} />
+
+            </div>
           </Drawer.Content>
         </Drawer>
       </div>

@@ -68,7 +68,7 @@ export const WalletDialog: FC = ({
               </div>
             </ButtonDropdown.Item>
         }
-        <ButtonDropdown.Item >
+        <ButtonDropdown.Item onClick={twitter}>
           <div className='flex flex-row w-full pl-4'>
             <div className='w-6 '>
               <Twitter size={20} />
