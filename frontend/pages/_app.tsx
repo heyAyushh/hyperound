@@ -3,6 +3,9 @@ import { ThemeProvider, useTheme } from 'next-themes';
 import { motion, AnimatePresence } from 'framer-motion';
 import '../styles/global.css';
 import Cursor from "../components/cursor";
+import {
+  RecoilRoot,
+} from 'recoil';
 
 const Geist = ({ Component, pageProps, router }) => {
 
@@ -48,11 +51,13 @@ const Geist = ({ Component, pageProps, router }) => {
 function MyApp({ Component, pageProps, router }): JSX.Element {
 
   return (
-    <ThemeProvider defaultTheme="dark" attribute="class" >
-      <AnimatePresence>
-        <Geist Component={Component} pageProps={pageProps} router={router} />
-      </AnimatePresence>
-    </ThemeProvider >
+    <RecoilRoot>
+      <ThemeProvider defaultTheme="dark" attribute="class" >
+        <AnimatePresence>
+          <Geist Component={Component} pageProps={pageProps} router={router} />
+        </AnimatePresence>
+      </ThemeProvider >
+    </RecoilRoot>
   )
 }
 

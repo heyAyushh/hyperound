@@ -10,7 +10,8 @@ export const Wallet: FC = () => {
   ], []);
 
   return (
-    <WalletProvider wallets={wallets} autoConnect>
+    // <WalletProvider wallets={wallets} autoConnect>
+    <WalletProvider wallets={wallets}>
       <WalletDialog />
     </WalletProvider>
   );

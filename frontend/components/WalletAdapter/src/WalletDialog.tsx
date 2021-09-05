@@ -19,7 +19,7 @@ export const WalletDialog: FC = ({
 
   const provider = getProvider();
 
-  const { wallets, select, wallet, disconnect, connecting, disconnecting, connected, autoConnect,  } = useWallet();
+  const { wallets, select, wallet, disconnect, connecting, disconnecting, connected, autoConnect } = useWallet();
   const router = useRouter();
 
   const handleDisconnectClick: MouseEventHandler<HTMLButtonElement> = useCallback(
@@ -45,40 +45,6 @@ export const WalletDialog: FC = ({
     return null;
   }, [children, connecting, disconnecting, connected, wallet]);
 
-  const signLoginString = async () => {
-    const challenge_req = await axios({
-      method: "get",
-      url: `https://api.hyperound.com/login/wallet/challenge?address=${provider && provider.publicKey ? provider.publicKey : ""}`
-    })
-
-    const data = new TextEncoder().encode(challenge_req.data.challenge);
-    // const data = new TextEncoder().encode("hello");
-    const signedMsg = await provider.signMessage(data);
-    const signature_array = [...signedMsg.signature];
-    console.log(signature_array);
-    const signedMsgString = new TextDecoder().decode(signedMsg.signature);
-
-    console.log(challenge_req.data.challenge);
-    console.log(provider ? provider.publicKey?.toBase58() : "");
-    console.log(signature_array);
-
-    try {
-      // console.log(provider.publicKey)
-      const done_req = await axios({
-        method: "post",
-        url: `https://api.hyperound.com/login/wallet/done`,
-        data: {
-          address: provider ? provider.publicKey?.toBase58() : "",
-          signature: signature_array
-        }
-      });
-
-      console.log(done_req);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
   return (
     <div>
       <ButtonDropdown>
@@ -87,8 +53,8 @@ export const WalletDialog: FC = ({
             <ButtonDropdown.Item main onClick={handleDisconnectClick}>
               <div className='flex flex-row'>
                 <LogIn size={20} />
-                <div className='pl-8 pr-4 h-4 right text-m'>
-                  {content}
+                <div className='pl-8 pr-4 h-4 right text-m '>
+                  {'Connected'}
                 </div>
               </div>
             </ButtonDropdown.Item>
@@ -103,11 +69,11 @@ export const WalletDialog: FC = ({
             </ButtonDropdown.Item>
         }
         <ButtonDropdown.Item >
-          <div className='flex flex-row w-full pl-6'>
+          <div className='flex flex-row w-full pl-4'>
             <div className='w-6 '>
               <Twitter size={20} />
             </div>
-            <div className='pl-6 pr-4 right text-m'>
+            <div className='pl-8 pr-4 right text-m'>
               Twitter
             </div>
           </div>
@@ -118,11 +84,10 @@ export const WalletDialog: FC = ({
               key={wlt.name}
               onClick={async () => {
                 select(wlt.name);
-                await signLoginString();
               }}>
               <div className="flex flex-row w-full pl-4">
                 <div className='w-6 bg-black rounded-full'>
-                  <Image src={wlt.icon} alt="wallet-icon"/>
+                  <Image src={wlt.icon} alt="wallet-icon" />
                 </div>
                 <div className='pl-8 pr-4 h-4 right text-m'>
                   {wlt.name}

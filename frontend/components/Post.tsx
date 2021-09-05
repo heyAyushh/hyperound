@@ -1,0 +1,1 @@
+export function Post(): JSX.Element { return (<>Hello</>) }

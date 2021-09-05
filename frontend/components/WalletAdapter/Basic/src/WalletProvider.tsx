@@ -6,6 +6,11 @@ import React, { FC, ReactNode, useCallback, useEffect, useMemo, useState } from 
 import { WalletNotSelectedError } from './errors';
 import { useLocalStorage } from './useLocalStorage';
 import { WalletContext } from './useWallet';
+import { Button, Spacer, useToasts } from "@geist-ui/react";
+import axios from "axios";
+import { getProvider } from "../../../../helpers/SolanaProvider";
+import { loggedInState } from "../../../../store/loggedIn";
+import { useRecoilState } from "recoil";
 
 export interface WalletProviderProps {
   children: ReactNode;
@@ -19,10 +24,17 @@ export const WalletProvider: FC<WalletProviderProps> = ({
   children,
   wallets,
   autoConnect = false,
-  onError = (error: WalletError) => console.error(error),
+  onError = (error: WalletError, setToast) => {
+    setToast({
+      text: error.message,
+      type: 'error',
+    })
+  },
   localStorageKey = 'walletName',
 }) => {
   const ISSERVER = typeof window === "undefined";
+
+  const [, setToast] = useToasts();
 
   if (!ISSERVER) {
     const [name, setName] = useLocalStorage<WalletName | null>(localStorageKey, null);
@@ -34,6 +46,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
     const [connected, setConnected] = useState(false);
     const [autoApprove, setAutoApprove] = useState(false);
     const [publicKey, setPublicKey] = useState<PublicKey | null>(null);
+    const [loggedIn, setLoggedin] = useRecoilState(loggedInState);
 
     const walletsByName = useMemo(
       () =>
@@ -64,13 +77,64 @@ export const WalletProvider: FC<WalletProviderProps> = ({
 
     const onReady = useCallback(() => setReady(true), [setReady]);
 
-    const onConnect = useCallback(() => {
+    // wallet login verify for backend
+    const signLoginString = async () => {
+      const [provider, loggedInAlready] = getProvider();
+
+      if (provider && !loggedInAlready) {
+        const challenge_req = await axios({
+          method: "get",
+          url: `https://api.hyperound.com/login/wallet/challenge?address=${provider && provider.publicKey ? provider.publicKey : ""}`
+        })
+
+        const data = new TextEncoder().encode(challenge_req.data.challenge);
+        // const data = new TextEncoder().encode("hello");
+        const signedMsg = await provider.signMessage(data);
+        const signature_array = [...signedMsg.signature];
+        // console.log(signature_array);
+        const signedMsgString = new TextDecoder().decode(signedMsg.signature);
+
+        // console.log(challenge_req.data.challenge);
+        // console.log(provider ? provider.publicKey?.toBase58() : "");
+        // console.log(signature_array);
+        // console.log(provider.publicKey);
+
+        const done_req = await axios({
+          method: "post",
+          url: `https://api.hyperound.com/login/wallet/done`,
+          data: {
+            address: provider ? provider.publicKey?.toBase58() : "",
+            signature: signature_array
+          }
+        });
+
+        localStorage.setItem('verifiedWallet', 'true');
+        console.log(done_req);
+      }
+    }
+
+    const onConnect = useCallback(async () => {
       if (!adapter) return;
 
-      setConnected(true);
-      setAutoApprove(adapter.autoApprove);
-      setPublicKey(adapter.publicKey);
-    }, [adapter, setConnected, setAutoApprove, setPublicKey]);
+      try {
+        await signLoginString();
+        setConnected(true);
+        setAutoApprove(adapter.autoApprove);
+        setPublicKey(adapter.publicKey);
+
+        if (localStorage.getItem('verifiedWallet') === 'false') {
+          setToast({
+            text: 'Connected Successfully!',
+            type: 'success'
+          })
+        }
+      } catch (err) {
+        onError(err, setToast);
+        select(null);
+        setConnected(false);
+      }
+
+    }, [adapter, select, setConnected, setAutoApprove, setPublicKey, onError, setToast, signLoginString]);
 
     const onDisconnect = useCallback(() => reset(), [reset]);
 
@@ -79,14 +143,14 @@ export const WalletProvider: FC<WalletProviderProps> = ({
 
       if (!wallet || !adapter) {
         const error = new WalletNotSelectedError();
-        onError(error);
+        onError(error, setToast);
         throw error;
       }
       if (!ready) {
         window.open(wallet.url, '_blank');
 
         const error = new WalletNotReadyError();
-        onError(error);
+        onError(error, setToast);
         throw error;
       }
 
@@ -96,7 +160,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
       } finally {
         setConnecting(false);
       }
-    }, [connecting, disconnecting, connected, adapter, onError, ready, wallet, setConnecting]);
+    }, [connecting, disconnecting, connected, adapter, onError, ready, wallet, setConnecting, setToast]);
 
     const disconnect = useCallback(async () => {
       if (disconnecting) return;
@@ -111,20 +175,25 @@ export const WalletProvider: FC<WalletProviderProps> = ({
         await adapter.disconnect();
       } finally {
         setDisconnecting(false);
+        setToast({
+          text: 'Disconnected Successfully!',
+          type: 'success',
+        })
+        localStorage.setItem('verifiedWallet', 'false');
         await select(null);
       }
-    }, [disconnecting, adapter, select, setDisconnecting]);
+    }, [disconnecting, adapter, select, setDisconnecting, setToast]);
 
     const signTransaction = useCallback(
       async (transaction: Transaction) => {
         if (!adapter) {
           const error = new WalletNotSelectedError();
-          onError(error);
+          onError(error, setToast);
           throw error;
         }
         if (!connected) {
           const error = new WalletNotConnectedError();
-          onError(error);
+          onError(error, setToast);
           throw error;
         }
 
@@ -137,12 +206,12 @@ export const WalletProvider: FC<WalletProviderProps> = ({
       async (transactions: Transaction[]) => {
         if (!adapter) {
           const error = new WalletNotSelectedError();
-          onError(error);
+          onError(error, setToast);
           throw error;
         }
         if (!connected) {
           const error = new WalletNotConnectedError();
-          onError(error);
+          onError(error, setToast);
           throw error;
         }
 
@@ -169,15 +238,15 @@ export const WalletProvider: FC<WalletProviderProps> = ({
         adapter.on('ready', onReady);
         adapter.on('connect', onConnect);
         adapter.on('disconnect', onDisconnect);
-        adapter.on('error', onError);
+        adapter.on('error', (err) => onError(err, setToast));
         return () => {
           adapter.off('ready', onReady);
           adapter.off('connect', onConnect);
           adapter.off('disconnect', onDisconnect);
-          adapter.off('error', onError);
+          adapter.off('error', (err) => onError(err, setToast));
         };
       }
-    }, [adapter, onReady, onConnect, onDisconnect, onError]);
+    }, [adapter, onReady, onConnect, onDisconnect, onError, setToast]);
 
     // If autoConnect is enabled, try to connect when the adapter changes and is ready
     useEffect(() => {
