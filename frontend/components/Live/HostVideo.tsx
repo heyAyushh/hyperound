@@ -1,9 +1,9 @@
 import { useHMSStore, selectCameraStreamByPeerID, useHMSActions } from "@100mslive/hms-video-react";
 import router from "next/router";
 import React, { useEffect } from "react";
-import { FiLogOut } from "react-icons/fi";
+import { FiLogOut, FiExternalLink } from "react-icons/fi";
 
-export function HostVideo({peer}) {
+export function HostVideo({peer, room_id}) {
 
     const hmsActions = useHMSActions();
     const videoRef = React.useRef(null);
@@ -42,7 +42,12 @@ export function HostVideo({peer}) {
                 paddingRight: "10px"
             }}>{peer.name}</p>
             <button
-                onClick={() => router.push("/")}
+                onClick={() => {
+                    let a = document.createElement("a");
+                    a.href = `https://hyperound.com/room/${room_id}`;
+                    a.setAttribute('target', '_blank');
+                    a.click();
+                }}
                 style={{
                     padding: "10px",
                     backgroundColor: "#FF0080",
@@ -51,7 +56,7 @@ export function HostVideo({peer}) {
                     right: "20px",
                     bottom: "15px",
                 }}
-            ><FiLogOut /></button>
+            ><FiExternalLink /></button>
         </div>
     )
 }

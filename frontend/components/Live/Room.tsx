@@ -7,7 +7,7 @@ import { Grid } from "@geist-ui/react";
 import { HostVideo } from "./HostVideo";
 import { VideoTile } from "./VideoTile";
 
-export default function Room() {
+export default function Room({room_id}) {
 
     const localPeer = useHMSStore(selectLocalPeer);
     const peers = useHMSStore(selectPeers);
@@ -25,7 +25,7 @@ export default function Room() {
                 position: "relative"
             }}>
                 <HostVideo
-                    peer={peers.find(o => o.roleName === "host")} 
+                    room_id={room_id} peer={peers.find(o => o.roleName === "host")} 
                 />
             </div>
             :
