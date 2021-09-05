@@ -122,12 +122,12 @@ export const WalletProvider: FC<WalletProviderProps> = ({
         setAutoApprove(adapter.autoApprove);
         setPublicKey(adapter.publicKey);
 
-        if (localStorage.getItem('verifiedWallet') === 'false') {
-          setToast({
-            text: 'Connected Successfully!',
-            type: 'success'
-          })
-        }
+        // if (localStorage.getItem('verifiedWallet') === 'false') {
+        //   setToast({
+        //     text: 'Connected Successfully!',
+        //     type: 'success'
+        //   })
+        // }
       } catch (err) {
         onError(err, setToast);
         select(null);
@@ -199,7 +199,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
 
         return await adapter.signTransaction(transaction);
       },
-      [adapter, onError, connected]
+      [adapter, onError, connected, setToast]
     );
 
     const signAllTransactions = useCallback(
