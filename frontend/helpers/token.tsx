@@ -6,7 +6,6 @@ const getProvider = async () => {
   if ("solana" in window) {
     const provider = (window as any).solana;
     if (provider.isPhantom) {
-      console.log("Is Phantom installed?  ", provider.isPhantom);
       return provider;
     }
   } else {
@@ -14,19 +13,22 @@ const getProvider = async () => {
   }
 };
 
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export async function createToken() {
   const provider = await getProvider();
-
-  const toWallet = provider.publicKey;
-
-  const fromWallet = web3.Keypair.generate();
 
   // Connect to cluster
   const connection = new web3.Connection(
     web3.clusterApiUrl('devnet'),
     'confirmed',
   );
+
+  const toWallet = provider.publicKey;
+  const fromWallet = web3.Keypair.generate();
 
   const fromAirdropSignature = await connection.requestAirdrop(
     fromWallet.publicKey,
@@ -36,7 +38,7 @@ export async function createToken() {
   //wait for airdrop confirmation
   await connection.confirmTransaction(fromAirdropSignature);
 
-  console.log('hi', fromWallet.publicKey)
+  // await delay(1000);
 
   //create new token mint
   const mint = await splToken.Token.createMint(
@@ -44,7 +46,7 @@ export async function createToken() {
     fromWallet,
     fromWallet.publicKey,
     null,
-    0,
+    9,
     splToken.TOKEN_PROGRAM_ID,
   );
 

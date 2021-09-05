@@ -1,4 +1,4 @@
-import { Avatar, Button, Grid, Page, Spacer, Card } from "@geist-ui/react";
+import { Avatar, Button, Grid, Page, Spacer, Card, useToasts } from "@geist-ui/react";
 import { useRouter } from 'next/router';
 import { useEffect } from "react";
 import { useRecoilState } from "recoil";
@@ -17,6 +17,7 @@ export default function Post(): JSX.Element {
   const [loggedIn, setTwitter] = useRecoilState(loggedInState);
   const [walletConnect, setWalletConnected] = useRecoilState(loggedInWalletState);
   const [token, setToken] = useRecoilState(tokenState);
+  const [_, setToast] = useToasts();
 
   return (
     <Page>
@@ -31,16 +32,33 @@ export default function Post(): JSX.Element {
           <Card shadow width="100%" >
             <Button onClick={async () => {
 
-              const data = await createToken();
+              try {
+                const data = await createToken();
 
-              setToken({
-                signature: data.signature,
-                transaction: data.transaction,
-                mint: data.mint,
-                exists: false,
-              })
+                setToken({
+                  signature: data.signature,
+                  transaction: data.transaction,
+                  mint: data.mint,
+                  exists: false,
+                })
 
-              console.log(data);
+                const action = {
+                  name: 'alert',
+                  handler: () => router.push('https://explorer.solana.com/?cluster=devnet')
+                }
+
+                setToast({
+                  text: 'Your Mint was suceessful',
+                  type: 'success',
+                  actions: [action],
+                })
+              } catch (err) {
+                setToast({
+                  text: err.message,
+                  type: 'error'
+                })
+              }
+
             }}>Create your token</Button>
             <Link href={'/' + username + '/live'} passHref>
               <Button >Go Live</Button>
