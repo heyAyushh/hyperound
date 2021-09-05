@@ -32,11 +32,17 @@ export async function createToken() {
 
   const fromAirdropSignature = await connection.requestAirdrop(
     fromWallet.publicKey,
-    web3.LAMPORTS_PER_SOL,
+    web3.LAMPORTS_PER_SOL / 10,
+  );
+
+  const toAirdropSignature = await connection.requestAirdrop(
+    fromWallet.publicKey,
+    web3.LAMPORTS_PER_SOL / 10,
   );
 
   //wait for airdrop confirmation
   await connection.confirmTransaction(fromAirdropSignature);
+  await connection.confirmTransaction(toAirdropSignature);
 
   // await delay(1000);
 
@@ -46,7 +52,7 @@ export async function createToken() {
     fromWallet,
     fromWallet.publicKey,
     null,
-    9,
+    1,
     splToken.TOKEN_PROGRAM_ID,
   );
 

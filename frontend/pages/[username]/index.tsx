@@ -1,6 +1,6 @@
 import { Avatar, Button, Grid, Page, Spacer, Card, useToasts } from "@geist-ui/react";
 import { useRouter } from 'next/router';
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 import Header from "../../components/header";
 import Restricted from "../../components/Restricted";
@@ -14,6 +14,7 @@ export default function Post(): JSX.Element {
 
   const { username } = router.query;
 
+  const [creatingToken, setCreatingToken] = useState(false);
   const [loggedIn, setTwitter] = useRecoilState(loggedInState);
   const [walletConnect, setWalletConnected] = useRecoilState(loggedInWalletState);
   const [token, setToken] = useRecoilState(tokenState);
@@ -30,36 +31,40 @@ export default function Post(): JSX.Element {
       <Grid.Container gap={2} justify="center">
         <Grid xs={12} md={16}>
           <Card shadow width="100%" >
-            <Button onClick={async () => {
+            <Button
+              loading={creatingToken}
+              onClick={async () => {
+                try {
+                  setCreatingToken(true);
+                  const data = await createToken();
 
-              try {
-                const data = await createToken();
+                  setToken({
+                    signature: data.signature,
+                    transaction: data.transaction,
+                    mint: data.mint,
+                    exists: false,
+                  })
+                  
+                  const action = {
+                    name: 'Check on Explorer',
+                    handler: () => router.push(`https://explorer.solana.com/address/${data.mint.publicKey.toBase58()}?cluster=devnet`)
+                  }
 
-                setToken({
-                  signature: data.signature,
-                  transaction: data.transaction,
-                  mint: data.mint,
-                  exists: false,
-                })
+                  setToast({
+                    text: 'Your Mint was suceessful!, Added to your wallet.',
+                    type: 'success',
+                    actions: [action],
+                  })
 
-                const action = {
-                  name: 'alert',
-                  handler: () => router.push('https://explorer.solana.com/?cluster=devnet')
+                  setCreatingToken(false);
+                } catch (err) {
+                  setToast({
+                    text: err.message,
+                    type: 'error'
+                  })
                 }
 
-                setToast({
-                  text: 'Your Mint was suceessful',
-                  type: 'success',
-                  actions: [action],
-                })
-              } catch (err) {
-                setToast({
-                  text: err.message,
-                  type: 'error'
-                })
-              }
-
-            }}>Create your token</Button>
+              }}>Create your token</Button>
             <Link href={'/' + username + '/live'} passHref>
               <Button >Go Live</Button>
             </Link>
