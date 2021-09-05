@@ -50,8 +50,8 @@ export default function Live(): JSX.Element {
         
         hmsActions.join({
             authToken: token,
-            // @ts-expect-error
-            userName: username 
+            // @ts-expect-error ,sa dknalj
+            userName: username  
         });
     };
 

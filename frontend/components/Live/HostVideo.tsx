@@ -43,7 +43,7 @@ export function HostVideo({peer, room_id}) {
             }}>{peer.name}</p>
             <button
                 onClick={() => {
-                    let a = document.createElement("a");
+                    const a = document.createElement("a");
                     a.href = `https://hyperound.com/room/${room_id}`;
                     a.setAttribute('target', '_blank');
                     a.click();
