@@ -7,6 +7,7 @@ import Restricted from "../../components/Restricted";
 import { createToken } from "../../helpers/token";
 import { loggedInState, loggedInTwitterState, loggedInWalletState } from "../../store/loggedIn";
 import { tokenState } from "../../store/token";
+import Link from 'next/link';
 
 export default function Post(): JSX.Element {
   const router = useRouter();
@@ -41,12 +42,15 @@ export default function Post(): JSX.Element {
 
               console.log(data);
             }}>Create your token</Button>
+            <Link href={'/' + username + '/live'} passHref>
+              <Button >Go Live</Button>
+            </Link>
           </Card>
         </Grid>
-        <Grid xs={12} md={8}><Card shadow width="100%"  />
+        <Grid xs={12} md={8}><Card shadow width="100%" />
           {/* Mint: {token.mint} */}
         </Grid>
       </ Grid.Container>
-    </Page>
+    </Page >
   )
 }
