@@ -1,7 +1,7 @@
 const { Post } = require('../models/post.js')
 
 module.exports = function (fastify, opts, done) {
-  fastify.get('/feed/latest', {
+    fastify.get('/feed/latest', {
     schema: {
       description: 'Fetch newest ten posts for home feed in chronological order',
       query: {
@@ -25,8 +25,8 @@ module.exports = function (fastify, opts, done) {
       const feedQuery = await Post.find(
         {
           locked: false,
-          updatedAt: { $lt: request.query.date || Date.now() }
-        }, { __v: 0, 'favorites.users': 0 })
+          updatedAt: { $lt: request.query.date ?? Date.now() }
+        }, { __v: 0, 'favorites.users': 0})
         .sort({ updatedAt: 'desc' }).limit(10).lean()
       reply.send(feedQuery)
     } catch (err) {
@@ -60,13 +60,10 @@ module.exports = function (fastify, opts, done) {
             content: { type: 'string' },
             contentType: { type: 'string' },
             favorites: {
-              type: 'object',
-              properties: {
-                count: { type: 'number' }
-              }
+              count: { type: 'number' }
             },
             createdAt: { type: 'string' },
-            updatedAt: { type: 'string' }
+            updatedAt: { type: 'string' },
           }
         }
       }
@@ -76,7 +73,7 @@ module.exports = function (fastify, opts, done) {
       const feedQuery = await Post.findOne(
         {
           locked: false,
-          updatedAt: { $gt: request.query.date }
+          updatedAt: { $gt: request.query.date  }
         }, { __v: 0, 'favorites.users': 0 })
         .sort({ updatedAt: 'desc' }).lean()
       reply.send(feedQuery)
@@ -112,7 +109,7 @@ module.exports = function (fastify, opts, done) {
       const feedQuery = await Post.find(
         {
           locked: false,
-          updatedAt: { $lt: request.query.date || Date.now(), $gte: Date.now() - 604800000 } // last 1 week
+          updatedAt: { $lt: request.query.date ?? Date.now(), $gte: Date.now() - 604800000 } // last 1 week
         }, { __v: 0, 'favorites.users': 0 })
         .sort({ 'favorites.count': 'desc' }).limit(10).lean()
       reply.send(feedQuery)

@@ -44,7 +44,7 @@ export default function Post(): JSX.Element {
                     mint: data.mint,
                     exists: false,
                   })
-                  
+
                   const action = {
                     name: 'Check on Explorer',
                     handler: () => router.push(`https://explorer.solana.com/address/${data.mint.publicKey.toBase58()}?cluster=devnet`)
@@ -70,8 +70,10 @@ export default function Post(): JSX.Element {
             </Link>
           </Card>
         </Grid>
-        <Grid xs={12} md={8}><Card shadow width="100%" />
-          {/* Mint: {token.mint} */}
+        <Grid xs={12} md={8}>
+          <Card shadow width="100%" >
+            Mint: {token.mint}
+          </Card>
         </Grid>
       </ Grid.Container>
     </Page >

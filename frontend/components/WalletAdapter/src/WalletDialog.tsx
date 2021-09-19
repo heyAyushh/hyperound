@@ -23,15 +23,14 @@ export const WalletDialog: FC = ({
   const handleDisconnectClick: MouseEventHandler<HTMLButtonElement> = useCallback(
     (event) => {
       if (onClick) onClick(event);
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      if (!event.defaultPrevented) disconnect().catch(() => { });
+      if (!event.defaultPrevented) disconnect();
     },
     [onClick, disconnect]
   );
 
   const twitter: MouseEventHandler<HTMLButtonElement> = (event) => {
     if (onClick) onClick(event);
-    if (!event.defaultPrevented) router.push('https://api.hyperound.com/login/twitter')
+    if (!event.defaultPrevented) router.push(`${process.env.NEXT_PUBLIC_BACKEND}/login/twitter`)
   }
 
   const content = useMemo(() => {
@@ -57,7 +56,10 @@ export const WalletDialog: FC = ({
               </div>
             </ButtonDropdown.Item>
             :
-            <ButtonDropdown.Item main onClick={(e) => select('Phantom' as WalletName)}>
+            <ButtonDropdown.Item main onClick={(event) => {
+              if (!event.defaultPrevented)
+                select('Phantom' as WalletName);
+            }}>
               <div className='flex flex-row'>
                 <LogIn size={20} />
                 <div className='pl-8 pr-4 h-4 right text-m'>

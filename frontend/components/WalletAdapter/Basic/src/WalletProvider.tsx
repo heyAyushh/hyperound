@@ -24,11 +24,23 @@ export const WalletProvider: FC<WalletProviderProps> = ({
   children,
   wallets,
   autoConnect = false,
-  onError = (error: WalletError, setToast) => {
-    setToast({
-      text: error.message,
-      type: 'error',
-    })
+  onError = (error: WalletError, setToast, msg?: string) => {
+    if (setToast) {
+      if (msg) {
+        setToast({
+          text: msg,
+          type: 'error',
+        })
+        return;
+      }
+      if (error?.message) {
+        setToast({
+          text: error.message,
+          type: 'error',
+        })
+        return;
+      }
+    }
   },
   localStorageKey = 'walletName',
 }) => {
@@ -85,7 +97,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
       if (provider && !loggedIn) {
         const challenge_req = await axios({
           method: "get",
-          url: `https://api.hyperound.com/login/wallet/challenge?address=${provider && provider.publicKey ? provider.publicKey : ""}`
+          url: `${process.env.NEXT_PUBLIC_BACKEND}/login/wallet/challenge?address=${provider && provider.publicKey ? provider.publicKey : ""}`
         })
 
         const data = new TextEncoder().encode(challenge_req.data.challenge);
@@ -100,21 +112,25 @@ export const WalletProvider: FC<WalletProviderProps> = ({
         // console.log(signature_array);
         // console.log(provider.publicKey);
 
-        await axios({
+        const backend_res_raw = await axios({
           method: "post",
-          url: `https://api.hyperound.com/login/wallet/done`,
+          url: `${process.env.NEXT_PUBLIC_BACKEND}/login/wallet/done`,
           data: {
             address: provider ? provider.publicKey?.toBase58() : "",
             signature: signature_array
           }
         });
 
+        const backend_res = backend_res_raw.data;
+        console.log(backend_res);
+
         setLoggedin(true);
         setloggedInWallet({
           publicKey: provider.publicKey?.toBase58(),
           provider: provider?.isPhantom,
           verified: true,
-        })
+        });
+        
         setToast({
           text: 'Connected Successfully!',
           type: 'success'
@@ -138,6 +154,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
         //   })
         // }
       } catch (err) {
+        console.log('wallet onconnect 141')
         onError(err, setToast);
         select(null);
         setConnected(false);
@@ -152,6 +169,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
 
       if (!wallet || !adapter) {
         const error = new WalletNotSelectedError();
+        console.log('wallet not selected 156')
         onError(error, setToast);
         throw error;
       }
@@ -159,6 +177,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
         window.open(wallet.url, '_blank');
 
         const error = new WalletNotReadyError();
+        console.log('wallet not ready 163')
         onError(error, setToast);
         throw error;
       }
@@ -166,7 +185,11 @@ export const WalletProvider: FC<WalletProviderProps> = ({
       setConnecting(true);
       try {
         await adapter.connect();
-      } finally {
+      } catch (err) {
+        console.log('wallet not 175')
+        onError(err, setToast);
+      }
+      finally {
         setConnecting(false);
       }
     }, [connecting, disconnecting, connected, adapter, onError, ready, wallet, setConnecting, setToast]);
@@ -203,11 +226,13 @@ export const WalletProvider: FC<WalletProviderProps> = ({
       async (transaction: Transaction) => {
         if (!adapter) {
           const error = new WalletNotSelectedError();
+          console.log('wallet not selected 209')
           onError(error, setToast);
           throw error;
         }
         if (!connected) {
           const error = new WalletNotConnectedError();
+          console.log('wallet not connected 215')
           onError(error, setToast);
           throw error;
         }
@@ -221,11 +246,13 @@ export const WalletProvider: FC<WalletProviderProps> = ({
       async (transactions: Transaction[]) => {
         if (!adapter) {
           const error = new WalletNotSelectedError();
+          console.log('wallet not selected 229')
           onError(error, setToast);
           throw error;
         }
         if (!connected) {
           const error = new WalletNotConnectedError();
+          console.log('wallet not connected 235')
           onError(error, setToast);
           throw error;
         }
@@ -272,6 +299,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
             await adapter.connect();
           } catch (error) {
             // Don't throw error, but onError will still be called
+            onError(error, setToast, 'Connection cancelled')
           } finally {
             setConnecting(false);
           }

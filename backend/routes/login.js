@@ -1,3 +1,4 @@
+const mongoose = require('mongoose')
 const nacl = require('tweetnacl')
 const { nanoid } = require('nanoid')
 const { User } = require('../models/user.js')
@@ -7,90 +8,29 @@ const { PublicKey } = require('@solana/web3.js')
 module.exports = function (fastify, opts, done) {
   fastify.get('/login/twitter/done', {
     schema: {
-      description: 'Internal endpoint to handle OAuth callback data',
-      response: {
-        200: {
-          description: 'Successful response',
-          type: 'object',
-          properties: {
-            _id: { type: 'string' },
-            username: { type: 'string' },
-            address: { type: 'string' },
-            twitter: {
-              type: 'object',
-              properties: {
-                id: { type: 'string' },
-                screen_name: { type: 'string' },
-                verified: { type: 'string' }
-              }
-            },
-            socials: {
-              type: 'object',
-              properties: {
-                twitter: { type: 'string' },
-                instagram: { type: 'string' },
-                facebook: { type: 'string' },
-                website: { type: 'string' }
-              }
-            },
-            followers: {
-              type: 'object',
-              properties: {
-                count: { type: 'number' },
-                users: { type: 'array' }
-              }
-            },
-            following: {
-              type: 'object',
-              properties: {
-                count: { type: 'number' },
-                users: { type: 'array' }
-              }
-            }
-          }
-        }
-      }
+      description: 'Internal endpoint to handle OAuth callback data'
     }
   }, async (request, reply) => {
     try {
       const twitterResponse = request.session.grant.response
       const userQuery = await User.findOne(
         { 'twitter.id': twitterResponse.raw.user_id },
-        { __v: 0, updatedAt: 0 })
+        { __v: 0, createdAt: 0, updatedAt: 0 })
         .lean()
       if (!userQuery) {
-        if (!request.session.user_id) {
-          // if no user with twitter id and no current session with user_id, create a new account
-          const newUser = new User({
-            twitter: {
-              id: twitterResponse.raw.user_id,
-              screen_name: twitterResponse.raw.screen_name,
-              verified: twitterResponse.profile.verified
-            }
-          })
-          const userObj = await newUser.save()
-          request.session.user_id = userObj._id
-          reply.send(userObj)
-        } else {
-          // check if user_id exists
-          const idQuery = await User.findById(request.session.user_id)
-          if (!idQuery) {
-            request.session.user_id = undefined // who is this?!
-            reply.code(403).send()
-            return
+        const newUser = new User({
+          twitter: {
+            id: twitterResponse.raw.user_id,
+            screen_name: twitterResponse.raw.screen_name,
+            verified: twitterResponse.profile.verified
           }
-          // user exists, connect account with twitter
-          const updatedUser = await User.findByIdAndUpdate(request.session.user_id,
-            { 'twitter.id': twitterResponse.raw.user_id }
-          )
-          request.session.touch()
-          reply.send(updatedUser)
-        }
+        })
+        const userObj = await newUser.save()
+        request.session.user_id = userObj._id
       } else {
-        // twitter id exists, log in
         request.session.user_id = userQuery._id
-        reply.send(userQuery)
       }
+      reply.send()
     } catch (err) {
       fastify.log.error('❎ error:' + err)
       if (!reply.sent) {
@@ -152,7 +92,7 @@ module.exports = function (fastify, opts, done) {
       description: 'Submit challenge signature for a wallet address',
       body: {
         type: 'object',
-        required: ['address', 'signature'],
+        required: ['address'],
         properties: {
           address: { type: 'string' },
           signature: { type: 'array' }
@@ -161,43 +101,7 @@ module.exports = function (fastify, opts, done) {
       response: {
         200: {
           description: 'Successful response',
-          type: 'object',
-          properties: {
-            _id: { type: 'string' },
-            username: { type: 'string' },
-            address: { type: 'string' },
-            twitter: {
-              type: 'object',
-              properties: {
-                id: { type: 'string' },
-                screen_name: { type: 'string' },
-                verified: { type: 'string' }
-              }
-            },
-            socials: {
-              type: 'object',
-              properties: {
-                twitter: { type: 'string' },
-                instagram: { type: 'string' },
-                facebook: { type: 'string' },
-                website: { type: 'string' }
-              }
-            },
-            followers: {
-              type: 'object',
-              properties: {
-                count: { type: 'number' },
-                users: { type: 'array' }
-              }
-            },
-            following: {
-              type: 'object',
-              properties: {
-                count: { type: 'number' },
-                users: { type: 'array' }
-              }
-            }
-          }
+          type: 'object'
         }
       }
     }
@@ -217,10 +121,11 @@ module.exports = function (fastify, opts, done) {
         reply.code(403).send({ error: 'Invalid signature for PubKey' })
         return
       }
-      const userQuery = await User.findOne({ address: request.body.address }).lean()
-      if (!userQuery) {
-        if (!request.session.user_id) {
-          // if no user with address and no current session with user_id, create a new account
+      if (!request.session.user_id) {
+        // if session has no user_id, uses wallet as login
+        const userQuery = await User.findOne({ address: request.body.address }).lean()
+        if (!userQuery) {
+          // if no user exists, register a new one with address and provide a cookie
           const newUser = new User({
             address: request.body.address
           })
@@ -228,24 +133,25 @@ module.exports = function (fastify, opts, done) {
           request.session.user_id = userObj._id
           reply.send(userObj)
         } else {
-          // check if user_id is valid
-          const idQuery = await User.findById(request.session.user_id)
-          if (!idQuery) {
-            request.session.user_id = undefined // who is this?!
-            reply.code(403).send()
-            return
-          }
-          // user exists, connect wallet to account
-          const updatedUser = await User.findByIdAndUpdate(request.session.user_id,
-            { address: request.body.address }
-          )
-          request.session.touch()
-          reply.send(updatedUser)
+          // user exists, provide a cookie
+          request.session.user_id = userQuery._id
+          reply.send(userQuery)
         }
       } else {
-        // user exists, login with wallet
-        request.session.user_id = userQuery._id
-        reply.send(userQuery)
+        // if session has user_id, uses wallet as login or for connecting accounts
+        const userQuery = await User.findOne({ _id: mongoose.Types.ObjectId(request.session.user_id) })
+        if (!userQuery) {
+          request.session.user_id = undefined // who is this?!
+          reply.code(403).send()
+        } else {
+          // increase existing cookie age to maxAge
+          const updatedUser = await User.updateOne(
+            { _id: mongoose.Types.ObjectId(request.session.user_id) },
+            { address: request.body. address}
+          )
+          request.session.touch()
+          reply.send(userQuery)
+        }
       }
     } catch (err) {
       fastify.log.error('❎ error:' + err)

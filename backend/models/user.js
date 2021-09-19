@@ -10,9 +10,6 @@ const userSchema = new mongoose.Schema({
   address: {
     type: String
   },
-  token: {
-    type: String
-  },
   twitter: {
     id: String,
     screen_name: String,

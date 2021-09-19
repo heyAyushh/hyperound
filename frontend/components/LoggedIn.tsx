@@ -25,14 +25,14 @@ export default function LoggedIn(): JSX.Element {
   }
 
   const getUrl = () => {
-    const url = 'https://avatars.dicebear.com/api/' + (getRandomInt(2) ? 'male/' : 'female/') + makeid(5) + '.svg';
+    const url = process.env.NEXT_PUBLIC_AVATAR_SRC + (getRandomInt(2) ? '/male/' : '/female/') + makeid(5) + '.svg';
 
     return url;
   }
 
   return (
     <>
-      <Link href={'/' + makeid(5)}>
+      <Link href={'/' + makeid(5)} passHref>
         <motion.div
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}

@@ -27,6 +27,7 @@
     "axios": "^0.21.1",
     "eventemitter3": "^4.0.7",
     "framer-motion": "^4.1.17",
+    "kbar": "0.1.0-beta.3",
     "mz": "^2.7.0",
     "next": "11.1.0",
     "next-themes": "^0.0.15",
