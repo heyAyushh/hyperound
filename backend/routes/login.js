@@ -101,7 +101,10 @@ module.exports = function (fastify, opts, done) {
       response: {
         200: {
           description: 'Successful response',
-          type: 'object'
+          type: 'object',
+          properties: {
+            
+          }
         }
       }
     }
