@@ -5,9 +5,12 @@ const userSchema = new mongoose.Schema({
   username: {
     type: String,
     unique: true,
-    default: nanoid(8)
+    default: nanoid
   },
   address: {
+    type: String
+  },
+  token: {
     type: String
   },
   twitter: {
