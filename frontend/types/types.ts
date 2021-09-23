@@ -10,6 +10,14 @@ export enum CHAINS {
   TEZOS = "tezos",
 }
 
+//keybar
+export enum VisualState {
+  animatingIn = "animating-in",
+  showing = "showing",
+  animatingOut = "animating-out",
+  hidden = "hidden",
+}
+
 // Avalanche
 export enum AVALANCHE_NETWORKS {
   MAINNET = "MAINNET",

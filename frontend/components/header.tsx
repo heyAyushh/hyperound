@@ -12,11 +12,11 @@ const Header = (): JSX.Element => {
 
   const Brand = () => (
     <Link href="/" passHref>
-      <div className="flex flex-row items-baseline">
-        <div className="pr-4">
+      <div className="flex flex-row items-stretch">
+        <div className="pr-4 self-center">
           <Layers />
         </div>
-        <div>
+        <div className="pt-3 self-auto">
           <h3 className="hover:underline text">hyperound</h3>
         </div>
       </div>
@@ -25,13 +25,14 @@ const Header = (): JSX.Element => {
 
   return (
     <>
+      <Spacer h={2} />
       {/* For Desktops */}
-      <div className="hidden sm:flex flex-row justify-between items-center py-2 mt-4 mb-10 w-full backdrop-blur-3xl">
+      <div className="hidden sm:flex flex-row justify-between items-center py-2 mt-4 w-full backdrop-blur-3xl">
         <h2 className="text-2xl md:text-4xl font-bold tracking-tight md:tracking-tighter leading-tight">
           <Brand />
         </h2>
 
-        <div className="flex flex-row ">
+        <div className="flex flex-row items-center">
           <div className="pr-8 ">
             <Wallet />
           </div>
@@ -59,7 +60,7 @@ const Header = (): JSX.Element => {
           <Drawer.Title>Hyperound.</Drawer.Title>
           <Drawer.Subtitle></Drawer.Subtitle>
           <Drawer.Content>
-            <div className="flex flex-col justify-items-center">
+            <div className="flex flex-col justify-items-center items-center">
               <Spacer h={5} />
               <div> <Wallet /> </div>
               <Spacer h={5} />

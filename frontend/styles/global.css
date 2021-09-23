@@ -3,8 +3,23 @@
 @tailwind utilities;
 
 * {
+  /* default cursor  */
   cursor: crosshair;
+
+  /* no scrollbar */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
+
+body {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+body::-webkit-scrollbar { 
+  display: none;  /* Safari and Chrome */
+}
+
 
 .cursor {
   position: fixed;
@@ -27,6 +42,8 @@
   image-rendering: pixelated;
 }
 
+
+
 .container {
   height: 200px;
   position: relative;
@@ -40,4 +57,10 @@
   left: 50%;
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
+}
+
+kbd {
+  font-family: monospace;
+  padding: calc(var(--unit) * 0.5);
+  border-radius: calc(var(--unit) * 0.5);
 }

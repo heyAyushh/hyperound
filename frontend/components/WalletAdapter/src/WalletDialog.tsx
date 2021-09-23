@@ -48,7 +48,7 @@ export const WalletDialog: FC = ({
         {
           content === 'Disconnect' ?
             <ButtonDropdown.Item main onClick={handleDisconnectClick}>
-              <div className='flex flex-row'>
+              <div className='flex flex-row hover:ml-2'>
                 <LogIn size={20} />
                 <div className='pl-8 pr-4 h-4 right text-m '>
                   {'Connected'}
@@ -62,14 +62,14 @@ export const WalletDialog: FC = ({
             }}>
               <div className='flex flex-row'>
                 <LogIn size={20} />
-                <div className='pl-8 pr-4 h-4 right text-m'>
+                <div className='pl-8 pr-4 h-4 right text-m hover:ml-2'>
                   {content ? content : 'Connect'}
                 </div>
               </div>
             </ButtonDropdown.Item>
         }
         <ButtonDropdown.Item onClick={twitter}>
-          <div className='flex flex-row w-full pl-4'>
+          <div className='flex flex-row w-full pl-4 hover:ml-2'>
             <div className='w-6 '>
               <Twitter size={20} />
             </div>
@@ -85,7 +85,7 @@ export const WalletDialog: FC = ({
               onClick={async () => {
                 select(wlt.name);
               }}>
-              <div className="flex flex-row w-full pl-4">
+              <div className="flex flex-row w-full pl-4 hover:ml-2">
                 <div className='w-6 bg-black rounded-full'>
                   <Image src={wlt.icon} alt="wallet-icon" />
                 </div>

@@ -5,9 +5,11 @@ import { useRecoilState } from "recoil";
 import Header from "../components/header";
 import { loggedInState } from "../store/loggedIn";
 import Link from 'next/link';
+import { userState } from "../store/user";
 
 export default function LoggedIn(): JSX.Element {
   const [isLoggedIn, setIsLoggedIn] = useRecoilState(loggedInState);
+  const [user, _setUser] = useRecoilState(userState);
 
   function getRandomInt(max) {
     return Math.floor(Math.random() * max);
@@ -25,14 +27,14 @@ export default function LoggedIn(): JSX.Element {
   }
 
   const getUrl = () => {
-    const url = process.env.NEXT_PUBLIC_AVATAR_SRC + (getRandomInt(2) ? '/male/' : '/female/') + makeid(5) + '.svg';
+    const url = process.env.NEXT_PUBLIC_AVATAR_SRC + (getRandomInt(2) ? '/male/' : '/female/') + user.username + '.svg';
 
     return url;
   }
 
   return (
     <>
-      <Link href={'/' + makeid(5)} passHref>
+      <Link href={'/' + user.username} passHref>
         <motion.div
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}

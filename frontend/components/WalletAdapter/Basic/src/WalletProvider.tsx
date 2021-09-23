@@ -11,6 +11,7 @@ import axios from "axios";
 import { getProvider } from "../../../../helpers/SolanaProvider";
 import { loggedInState, loggedInWalletState } from "../../../../store/loggedIn";
 import { useRecoilState } from "recoil";
+import { userState } from "../../../../store/user";
 
 export interface WalletProviderProps {
   children: ReactNode;
@@ -60,6 +61,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
     const [publicKey, setPublicKey] = useState<PublicKey | null>(null);
     const [loggedIn, setLoggedin] = useRecoilState(loggedInState);
     const [loggedInWallet, setloggedInWallet] = useRecoilState(loggedInWalletState);
+    const [user, setUser] = useRecoilState(userState);
 
     const walletsByName = useMemo(
       () =>
@@ -121,8 +123,8 @@ export const WalletProvider: FC<WalletProviderProps> = ({
           }
         });
 
-        const backend_res = backend_res_raw.data;
-        console.log(backend_res);
+        const user = backend_res_raw.data;
+        setUser(user)
 
         setLoggedin(true);
         setloggedInWallet({
@@ -130,7 +132,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
           provider: provider?.isPhantom,
           verified: true,
         });
-        
+
         setToast({
           text: 'Connected Successfully!',
           type: 'success'
