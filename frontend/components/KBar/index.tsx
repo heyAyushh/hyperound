@@ -2,6 +2,7 @@ import * as React from 'react';
 import { KBarResults, KBarSearch, KBarProvider, KBarContext, useKBar, KBarPortal, KBarPositioner, KBarAnimator } from 'kbar';
 import { useRouter } from "next/router";
 import { useTheme } from "next-themes";
+import { useMediaQuery } from "@geist-ui/react";
 
 const searchStyle = {
   padding: "12px 16px",
@@ -22,10 +23,12 @@ const resultsStyle = {
 const App = ({ Component, pageProps }): JSX.Element => {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+  const isMobile = useMediaQuery('mobile');
 
   const animatorStyle = {
-    maxWidth: "500px",
+    maxWidth: isMobile ? "300px" : "500px",
     width: "100%",
+    marginRight: isMobile ? '32px' : '0px',
     background: theme === 'light' ? 'white' : 'black',
     borderRadius: "8px",
     overflow: "hidden",

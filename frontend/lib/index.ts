@@ -35,3 +35,10 @@ export const getSafeUrl = (force = true ) =>
   force 
     ? "https://api.devnet.solana.com" 
     : getSolanaUrl(SOLANA_NETWORKS.DEVNET, SOLANA_PROTOCOLS.RPC)
+
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export async function delay(ms: number) {
+      return new Promise(resolve => {
+        setTimeout(resolve, ms);
+      });
+    } 

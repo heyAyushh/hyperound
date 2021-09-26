@@ -11,6 +11,41 @@ import { Divider } from "@geist-ui/react";
 import { useKBar } from "kbar";
 import { VisualState } from "../../types/types";
 import Footer from "../../components/Footer";
+import { GetServerSidePropsContext } from "next";
+
+export async function getServerSideProps(context: GetServerSidePropsContext): Promise<any> {
+  const { username } = context.params;
+  const backend = process.env.NEXT_PUBLIC_BACKEND;
+
+  let data;
+
+  try {
+    const res = await fetch(`${backend}/profile/name/${username}`);
+    data = await res.json();
+  } catch (err) {
+    return {
+      redirect: {
+        destination: '/404',
+        permanent: true,
+      },
+    }
+  }
+
+  // or use context.resolvedUrl for conditional redirect
+  // if(context.resolvedUrl == "/")
+  if (data.statusCode === 404) {
+    return {
+      redirect: {
+        destination: '/404',
+        permanent: true,
+      },
+    }
+  }
+
+  return {
+    props: {}, // will be passed to the page component as props
+  }
+}
 
 export default function Post(): JSX.Element {
   const router = useRouter();

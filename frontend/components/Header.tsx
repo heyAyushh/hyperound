@@ -6,9 +6,11 @@ import React, { useEffect } from "react"
 import { Button, Drawer, Spacer, Page } from "@geist-ui/react"
 import LoggedIn from "./LoggedIn"
 import KbarButton from "./KBar/button"
+import { useRecoilState } from "recoil"
+import { mobileNavbarVisiblityState } from "../store/mobileNavbar"
 
 const Header = (): JSX.Element => {
-  const [state, setState] = React.useState(false);
+  const [state, setState] = useRecoilState(mobileNavbarVisiblityState);
 
   const Brand = () => (
     <Page.Header>
@@ -62,17 +64,14 @@ const Header = (): JSX.Element => {
           <Button iconRight={<Sidebar />} auto scale={1} px={0.6} onClick={() => setState(true)} />
         </div>
         <Drawer visible={state} onClose={() => setState(false)} placement="right">
-          <Drawer.Title><Brand /></Drawer.Title>
+          <Drawer.Title></Drawer.Title>
           <Drawer.Subtitle></Drawer.Subtitle>
           <Drawer.Content>
-            <div className="flex flex-col justify-items-center items-center">
-              <Spacer h={5} />
+            <div className="flex flex-col gap-8 justify-around items-center h-full">
               <div> <Wallet /> </div>
-              <Spacer h={5} />
-              <div> <KbarButton /></div>
-              <Spacer h={5} />
+              <div> <LoggedIn /> </div >
+              <div> <KbarButton /> </div>
               <div> <ThemeSwitch /> </div>
-              <Spacer h={5} />
             </div>
           </Drawer.Content>
         </Drawer>

@@ -14,21 +14,17 @@ import { SWRConfig } from "swr";
 import { fetcher } from "../helpers/swr";
 
 const Geist = ({ Component, pageProps, router }): JSX.Element => {
+  const { theme } = useTheme() as { theme: 'light' | 'dark' };
 
-  const { theme } = useTheme();
-
-  const ISSERVER = typeof window === "undefined";
+  const ISSERVER = typeof window === 'undefined';
 
   if (ISSERVER) {
-    return (
-      <>
-      </>
-    )
+    return <></>
   }
 
   return (
     <HMSRoomProvider>
-      <HMSThemeProvider config={{}} appBuilder={{ theme: "dark" }}>
+      <HMSThemeProvider config={{}} appBuilder={{ theme }}>
         <GeistProvider themeType={theme}>
           <CssBaseline />
           <Disconnect />

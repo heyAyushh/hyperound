@@ -1,9 +1,13 @@
 import { Keyboard } from "@geist-ui/react";
 import { useKBar, VisualState } from "kbar";
 import { useTheme } from "next-themes";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
+import { useRecoilState } from "recoil";
+import { mobileNavbarVisiblityState } from "../../store/mobileNavbar";
 
 export default function KbarButton(): JSX.Element {
+
+  const [, setState] = useRecoilState(mobileNavbarVisiblityState);
 
   const { query } = useKBar();
   const { theme } = useTheme();
@@ -20,17 +24,23 @@ export default function KbarButton(): JSX.Element {
       command
       className={
         isLight ?
-          "hover:bg-light-accent-2 hover:border-black"
+          "hover:bg-light-accent-2 hover:border-black bg-light-accent-1"
           : "hover:bg-dark-accent-2 hover:border-white"
       }
       scale={1.2}
-      onClick={() =>
-        // TODO: we can expose a query.toggle to handle this logic within the library itself
+      onClick={() => {
+        // turn off navbar
+        setState(false);
+
+        // turn on kBar
         query.setVisualState((vs) =>
-          [VisualState.animatingOut, VisualState.hidden].includes(vs)
+          [
+            VisualState.animatingOut,
+            VisualState.hidden
+          ].includes(vs)
             ? VisualState.animatingIn
             : VisualState.animatingOut
-        )
-      }>k</Keyboard>
+        );
+      }}>k</Keyboard>
   )
 }
