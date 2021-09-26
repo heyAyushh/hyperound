@@ -9,8 +9,9 @@ import { WalletContext } from './useWallet';
 import { useToasts } from "@geist-ui/react";
 import axios from "axios";
 import { getProvider } from "../../../../helpers/SolanaProvider";
-import { loggedInState, loggedInWalletState } from "../../../../store/loggedIn";
+import { loggedInState, loggedInWalletState, walletAutoConnectState } from "../../../../store/loggedIn";
 import { useRecoilState } from "recoil";
+import { userState } from "../../../../store/user";
 
 export interface WalletProviderProps {
   children: ReactNode;
@@ -24,11 +25,23 @@ export const WalletProvider: FC<WalletProviderProps> = ({
   children,
   wallets,
   autoConnect = false,
-  onError = (error: WalletError, setToast) => {
-    setToast({
-      text: error.message,
-      type: 'error',
-    })
+  onError = (error: WalletError, setToast, msg?: string) => {
+    if (setToast) {
+      if (msg) {
+        setToast({
+          text: msg,
+          type: 'error',
+        })
+        return;
+      }
+      if (error?.message) {
+        setToast({
+          text: error.message,
+          type: 'error',
+        })
+        return;
+      }
+    }
   },
   localStorageKey = 'walletName',
 }) => {
@@ -48,6 +61,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
     const [publicKey, setPublicKey] = useState<PublicKey | null>(null);
     const [loggedIn, setLoggedin] = useRecoilState(loggedInState);
     const [loggedInWallet, setloggedInWallet] = useRecoilState(loggedInWalletState);
+    const [user, setUser] = useRecoilState(userState);
 
     const walletsByName = useMemo(
       () =>
@@ -85,7 +99,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
       if (provider && !loggedIn) {
         const challenge_req = await axios({
           method: "get",
-          url: `https://api.hyperound.com/login/wallet/challenge?address=${provider && provider.publicKey ? provider.publicKey : ""}`
+          url: `${process.env.NEXT_PUBLIC_BACKEND}/login/wallet/challenge?address=${provider && provider.publicKey ? provider.publicKey : ""}`
         })
 
         const data = new TextEncoder().encode(challenge_req.data.challenge);
@@ -100,21 +114,25 @@ export const WalletProvider: FC<WalletProviderProps> = ({
         // console.log(signature_array);
         // console.log(provider.publicKey);
 
-        await axios({
+        const backend_res_raw = await axios({
           method: "post",
-          url: `https://api.hyperound.com/login/wallet/done`,
+          url: `${process.env.NEXT_PUBLIC_BACKEND}/login/wallet/done`,
           data: {
             address: provider ? provider.publicKey?.toBase58() : "",
             signature: signature_array
           }
         });
 
+        const user = backend_res_raw.data;
+        setUser(user)
+
         setLoggedin(true);
         setloggedInWallet({
           publicKey: provider.publicKey?.toBase58(),
           provider: provider?.isPhantom,
           verified: true,
-        })
+        });
+
         setToast({
           text: 'Connected Successfully!',
           type: 'success'
@@ -138,6 +156,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
         //   })
         // }
       } catch (err) {
+        console.log('wallet onconnect 141')
         onError(err, setToast);
         select(null);
         setConnected(false);
@@ -152,6 +171,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
 
       if (!wallet || !adapter) {
         const error = new WalletNotSelectedError();
+        console.log('wallet not selected 156')
         onError(error, setToast);
         throw error;
       }
@@ -159,6 +179,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
         window.open(wallet.url, '_blank');
 
         const error = new WalletNotReadyError();
+        console.log('wallet not ready 163')
         onError(error, setToast);
         throw error;
       }
@@ -166,7 +187,11 @@ export const WalletProvider: FC<WalletProviderProps> = ({
       setConnecting(true);
       try {
         await adapter.connect();
-      } finally {
+      } catch (err) {
+        console.log('wallet not 175')
+        onError(err, setToast);
+      }
+      finally {
         setConnecting(false);
       }
     }, [connecting, disconnecting, connected, adapter, onError, ready, wallet, setConnecting, setToast]);
@@ -203,11 +228,13 @@ export const WalletProvider: FC<WalletProviderProps> = ({
       async (transaction: Transaction) => {
         if (!adapter) {
           const error = new WalletNotSelectedError();
+          console.log('wallet not selected 209')
           onError(error, setToast);
           throw error;
         }
         if (!connected) {
           const error = new WalletNotConnectedError();
+          console.log('wallet not connected 215')
           onError(error, setToast);
           throw error;
         }
@@ -221,11 +248,13 @@ export const WalletProvider: FC<WalletProviderProps> = ({
       async (transactions: Transaction[]) => {
         if (!adapter) {
           const error = new WalletNotSelectedError();
+          console.log('wallet not selected 229')
           onError(error, setToast);
           throw error;
         }
         if (!connected) {
           const error = new WalletNotConnectedError();
+          console.log('wallet not connected 235')
           onError(error, setToast);
           throw error;
         }
@@ -234,6 +263,8 @@ export const WalletProvider: FC<WalletProviderProps> = ({
       },
       [adapter, onError, connected, setToast]
     );
+
+    const [walletAutoConnect, setWalletAutoConnect] = useRecoilState(walletAutoConnectState)
 
     // Reset state and set the wallet, adapter, and ready state when the name changes
     useEffect(() => {
@@ -265,18 +296,22 @@ export const WalletProvider: FC<WalletProviderProps> = ({
 
     // If autoConnect is enabled, try to connect when the adapter changes and is ready
     useEffect(() => {
-      if (autoConnect && adapter && ready) {
+      if (autoConnect && setWalletAutoConnect && adapter && ready) {
         (async function () {
           setConnecting(true);
           try {
             await adapter.connect();
           } catch (error) {
             // Don't throw error, but onError will still be called
+            onError(error, setToast, 'Connection cancelled');
+            console.log(error)
+            setWalletAutoConnect(false);
           } finally {
             setConnecting(false);
           }
         })();
       }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [autoConnect, adapter, ready, setConnecting]);
 
     return (

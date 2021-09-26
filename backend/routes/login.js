@@ -1,4 +1,5 @@
 const nacl = require('tweetnacl')
+const querystring = require('querystring')
 const { nanoid } = require('nanoid')
 const { User } = require('../models/user.js')
 const { Challenge } = require('../models/challenge.js')
@@ -70,7 +71,8 @@ module.exports = function (fastify, opts, done) {
           })
           const userObj = await newUser.save()
           request.session.user_id = userObj._id
-          reply.send(userObj)
+          const responseObj = { state: Buffer.from(JSON.stringify(userObj)).toString('base64'), twitter_auth: true }
+          reply.redirect(`https://${process.env.DOMAIN || process.env.BASE_URL}/auth/twitter/done?${querystring.stringify(responseObj)}`)
         } else {
           // check if user_id exists
           const idQuery = await User.findById(request.session.user_id)
@@ -84,12 +86,14 @@ module.exports = function (fastify, opts, done) {
             { 'twitter.id': twitterResponse.raw.user_id }
           )
           request.session.touch()
-          reply.send(updatedUser)
+          const responseObj = { state: Buffer.from(JSON.stringify(updatedUser)).toString('base64'), twitter_auth: true }
+          reply.redirect(`https://${process.env.DOMAIN || process.env.BASE_URL}/auth/twitter/done?${querystring.stringify(responseObj)}`)
         }
       } else {
         // twitter id exists, log in
         request.session.user_id = userQuery._id
-        reply.send(userQuery)
+        const responseObj = { state: Buffer.from(JSON.stringify(userQuery)).toString('base64'), twitter_auth: true }
+        reply.redirect(`https://${process.env.DOMAIN || process.env.BASE_URL}/auth/twitter/done?${querystring.stringify(responseObj)}`)
       }
     } catch (err) {
       fastify.log.error('❎ error:' + err)
@@ -125,7 +129,7 @@ module.exports = function (fastify, opts, done) {
         reply.code(400).send({ error: 'Invalid address sent' })
         return
       }
-      const newChallenge = `Hey, please sign this to verify your address! ${await nanoid(8)}`
+      const newChallenge = `Hey,\n please sign this message ${await nanoid(8)} &\n verify your connection to Hyperound!`
       const oldChallenge = await Challenge.findOne({ address: request.query.address })
       if (!oldChallenge) {
         await Challenge.create({

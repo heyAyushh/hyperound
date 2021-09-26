@@ -8,8 +8,12 @@ import {
 } from 'recoil';
 import { HMSRoomProvider, HMSThemeProvider } from "@100mslive/hms-video-react";
 import { Disconnect } from "../components/Live/Disconnect";
+import React from "react";
+import KBar from "../components/KBar";
+import { SWRConfig } from "swr";
+import { fetcher } from "../helpers/swr";
 
-const Geist = ({ Component, pageProps, router }) => {
+const Geist = ({ Component, pageProps, router }): JSX.Element => {
 
   const { theme } = useTheme();
 
@@ -24,48 +28,59 @@ const Geist = ({ Component, pageProps, router }) => {
 
   return (
     <HMSRoomProvider>
-      <HMSThemeProvider config={{}} appBuilder={{theme: "dark"}}>
+      <HMSThemeProvider config={{}} appBuilder={{ theme: "dark" }}>
         <GeistProvider themeType={theme}>
           <CssBaseline />
           <Disconnect />
-          <motion.div key={router.route} initial="pageInitial" animate="pageAnimate" exit="pageExit" variants={{
-            pageInitial: {
-              opacity: 0
-            },
-            pageAnimate: {
-              opacity: 1
-            },
-            pageExit: {
-              // filter: [
-              //   'hue-rotate(0) contrast(100%)',
-              //   'hue-rotate(360deg) contrast(200%)',
-              //   'hue-rotate(45deg) contrast(300%)',
-              //   'hue-rotate(0) contrast(100%)'
-              // ],
-              opacity: 0
-            }
-          }}>
-            <Component {...pageProps} />
+          <motion.div key={router.route}
+            initial="pageInitial"
+            animate="pageAnimate"
+            exit="pageExit"
+            variants={{
+              pageInitial: {
+                opacity: 0
+              },
+              pageAnimate: {
+                opacity: 1
+              },
+              pageExit: {
+                // filter: [
+                //   'hue-rotate(0) contrast(100%)',
+                //   'hue-rotate(360deg) contrast(200%)',
+                //   'hue-rotate(45deg) contrast(300%)',
+                //   'hue-rotate(0) contrast(100%)'
+                // ],
+                opacity: 0
+              }
+            }}>
+            {/* // actual component goes inside */}
+            <KBar Component={Component} pageProps={pageProps} />
             <Cursor />
           </motion.div>
         </GeistProvider>
       </HMSThemeProvider>
-    </HMSRoomProvider>
+    </HMSRoomProvider >
   )
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 function MyApp({ Component, pageProps, router }): JSX.Element {
 
   return (
-    <RecoilRoot>
-      <ThemeProvider defaultTheme="dark" attribute="class" >
-        <AnimatePresence>
-          <Geist Component={Component} pageProps={pageProps} router={router} />
-        </AnimatePresence>
-      </ThemeProvider >
-    </RecoilRoot>
+    <SWRConfig value={{
+      fetcher: fetcher,
+      onError: (err) => {
+        console.error(err);
+      },
+    }}>
+      <RecoilRoot>
+        <ThemeProvider defaultTheme="dark" attribute="class" >
+          <AnimatePresence>
+            <Geist Component={Component} pageProps={pageProps} router={router} />
+          </AnimatePresence>
+        </ThemeProvider >
+      </RecoilRoot>
+    </SWRConfig>
   )
 }
 
-export default MyApp
+export default MyApp;

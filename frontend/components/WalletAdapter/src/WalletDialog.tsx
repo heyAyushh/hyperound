@@ -23,15 +23,14 @@ export const WalletDialog: FC = ({
   const handleDisconnectClick: MouseEventHandler<HTMLButtonElement> = useCallback(
     (event) => {
       if (onClick) onClick(event);
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      if (!event.defaultPrevented) disconnect().catch(() => { });
+      if (!event.defaultPrevented) disconnect();
     },
     [onClick, disconnect]
   );
 
   const twitter: MouseEventHandler<HTMLButtonElement> = (event) => {
     if (onClick) onClick(event);
-    if (!event.defaultPrevented) router.push('https://api.hyperound.com/login/twitter')
+    if (!event.defaultPrevented) router.push(`${process.env.NEXT_PUBLIC_BACKEND}/login/twitter`)
   }
 
   const content = useMemo(() => {
@@ -49,7 +48,7 @@ export const WalletDialog: FC = ({
         {
           content === 'Disconnect' ?
             <ButtonDropdown.Item main onClick={handleDisconnectClick}>
-              <div className='flex flex-row'>
+              <div className='flex flex-row hover:ml-2'>
                 <LogIn size={20} />
                 <div className='pl-8 pr-4 h-4 right text-m '>
                   {'Connected'}
@@ -57,17 +56,20 @@ export const WalletDialog: FC = ({
               </div>
             </ButtonDropdown.Item>
             :
-            <ButtonDropdown.Item main onClick={(e) => select('Phantom' as WalletName)}>
+            <ButtonDropdown.Item main onClick={(event) => {
+              if (!event.defaultPrevented)
+                select('Phantom' as WalletName);
+            }}>
               <div className='flex flex-row'>
                 <LogIn size={20} />
-                <div className='pl-8 pr-4 h-4 right text-m'>
+                <div className='pl-8 pr-4 h-4 right text-m hover:ml-2'>
                   {content ? content : 'Connect'}
                 </div>
               </div>
             </ButtonDropdown.Item>
         }
         <ButtonDropdown.Item onClick={twitter}>
-          <div className='flex flex-row w-full pl-4'>
+          <div className='flex flex-row w-full pl-4 hover:ml-2'>
             <div className='w-6 '>
               <Twitter size={20} />
             </div>
@@ -83,7 +85,7 @@ export const WalletDialog: FC = ({
               onClick={async () => {
                 select(wlt.name);
               }}>
-              <div className="flex flex-row w-full pl-4">
+              <div className="flex flex-row w-full pl-4 hover:ml-2">
                 <div className='w-6 bg-black rounded-full'>
                   <Image src={wlt.icon} alt="wallet-icon" />
                 </div>

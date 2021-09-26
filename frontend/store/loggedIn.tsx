@@ -20,6 +20,11 @@ export const loggedInWalletState = atom({
   }
 });
 
+export const walletAutoConnectState = atom({
+  key: 'walletAutoConnect', // unique ID (with respect to other atoms/selectors)
+  default: false
+});
+
 // export const charCountState = selector({
 //   key: 'charCountState', // unique ID (with respect to other atoms/selectors)
 //   get: ({ get }) => {

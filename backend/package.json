@@ -5,7 +5,10 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "standard --fix"
+    "lint": "standard --fix",
+    "prod": "pm2 start server.js",
+    "monitor": "pm2 monit",
+    "dev": "nodemon server.js"
   },
   "author": "team-undefined",
   "license": "UNLICENSED",
@@ -24,9 +27,11 @@
     "grant": "^5.4.16",
     "mongoose": "^5.13.7",
     "nanoid": "^3.1.25",
+    "pm2": "^5.1.1",
     "tweetnacl": "^1.0.3"
   },
   "devDependencies": {
+    "nodemon": "^2.0.13",
     "standard": "^16.0.3"
   }
 }
