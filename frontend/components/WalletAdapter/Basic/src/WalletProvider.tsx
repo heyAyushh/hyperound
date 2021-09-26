@@ -9,7 +9,7 @@ import { WalletContext } from './useWallet';
 import { useToasts } from "@geist-ui/react";
 import axios from "axios";
 import { getProvider } from "../../../../helpers/SolanaProvider";
-import { loggedInState, loggedInWalletState } from "../../../../store/loggedIn";
+import { loggedInState, loggedInWalletState, walletAutoConnectState } from "../../../../store/loggedIn";
 import { useRecoilState } from "recoil";
 import { userState } from "../../../../store/user";
 
@@ -264,6 +264,8 @@ export const WalletProvider: FC<WalletProviderProps> = ({
       [adapter, onError, connected, setToast]
     );
 
+    const [walletAutoConnect, setWalletAutoConnect] = useRecoilState(walletAutoConnectState)
+
     // Reset state and set the wallet, adapter, and ready state when the name changes
     useEffect(() => {
       reset();
@@ -294,19 +296,22 @@ export const WalletProvider: FC<WalletProviderProps> = ({
 
     // If autoConnect is enabled, try to connect when the adapter changes and is ready
     useEffect(() => {
-      if (autoConnect && adapter && ready) {
+      if (autoConnect && setWalletAutoConnect && adapter && ready) {
         (async function () {
           setConnecting(true);
           try {
             await adapter.connect();
           } catch (error) {
             // Don't throw error, but onError will still be called
-            onError(error, setToast, 'Connection cancelled')
+            onError(error, setToast, 'Connection cancelled');
+            console.log(error)
+            setWalletAutoConnect(false);
           } finally {
             setConnecting(false);
           }
         })();
       }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [autoConnect, adapter, ready, setConnecting]);
 
     return (

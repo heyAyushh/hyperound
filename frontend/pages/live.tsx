@@ -1,9 +1,10 @@
-import Header from '../components/header';
+import Header from '../components/Header';
 import { Page, Text } from "@geist-ui/react";
 import JoinForm from '../components/Live/JoinForm';
 import { useHMSActions, useHMSStore, selectIsConnectedToRoom } from '@100mslive/hms-video-react';
 import { useEffect, useState } from 'react';
 import Room from '../components/Live/Room';
+import Footer from "../components/Footer";
 
 const tokenEndpoint = "https://prod-in.100ms.live/hmsapi/hyperound.app.100ms.live/api/token";
 
@@ -23,34 +24,34 @@ const getToken = async (user_id) => {
 
 export default function Live(): JSX.Element {
 
-    const hmsActions = useHMSActions();
-    const isConnected = useHMSStore(selectIsConnectedToRoom);
+  const hmsActions = useHMSActions();
+  const isConnected = useHMSStore(selectIsConnectedToRoom);
 
-    useEffect(() => {
-      window.onunload = () => {
-        if (isConnected) {
-          hmsActions.leave();
-        }
-      };
-    }, [hmsActions, isConnected]);
-
-    const handleSubmit = async (uname) => {
-      const token = await getToken(uname);
-      
-      hmsActions.join({
-        authToken: token,
-        userName: uname 
-      });
+  useEffect(() => {
+    window.onunload = () => {
+      if (isConnected) {
+        hmsActions.leave();
+      }
     };
+  }, [hmsActions, isConnected]);
 
-    return (
-      <Page>
-        <Page.Header>
-          <Header />
-        </Page.Header>
-  
-        {/* <Text h1 className={'font-extrabold md:text-9xl m-5 text-5xl'}>live streaming</Text> */}
-        {/* {isConnected ? <Room /> :  <JoinForm handleSubmit={handleSubmit} />} */}
-      </Page>
-    );
-  }
+  const handleSubmit = async (uname) => {
+    const token = await getToken(uname);
+
+    hmsActions.join({
+      authToken: token,
+      userName: uname
+    });
+  };
+
+  return (
+    <Page>
+      <Header />
+
+      {/* <Text h1 className={'font-extrabold md:text-9xl m-5 text-5xl'}>live streaming</Text> */}
+      {/* {isConnected ? <Room /> :  <JoinForm handleSubmit={handleSubmit} />} */}
+
+      <Footer />
+    </Page>
+  );
+}

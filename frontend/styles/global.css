@@ -42,8 +42,6 @@ body::-webkit-scrollbar {
   image-rendering: pixelated;
 }
 
-
-
 .container {
   height: 200px;
   position: relative;
@@ -63,4 +61,13 @@ kbd {
   font-family: monospace;
   padding: calc(var(--unit) * 0.5);
   border-radius: calc(var(--unit) * 0.5);
+}
+
+.GiestButton-blurred {
+  filter: blur(16px)
+}
+
+.GiestButton {
+  /* filter: blur(16px) */
+  color: blueviolet;
 }

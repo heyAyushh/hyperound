@@ -1,17 +1,16 @@
-import Header from '../components/header';
+import Header from '../components/Header';
 import { Page, Text } from "@geist-ui/react";
 import { ArrowUpRight } from '@geist-ui/react-icons'
 import { useState } from "react";
+import { useKBar } from "kbar";
+import Footer from "../components/Footer";
 
 export default function Home(): JSX.Element {
   const [isShown, setIsShown] = useState(false);
 
   return (
     <Page>
-      <Page.Header>
-        <Header />
-      </Page.Header>
-
+      <Header />
       <Page.Content>
 
         <a href="https://1drv.ms/b/s!AgCX9eaTq2RjgtVKYvi_ifv9aaZ7aQ?e=ZSkfX4"
@@ -26,6 +25,7 @@ export default function Home(): JSX.Element {
         </a>
 
       </Page.Content>
+      <Footer />
     </Page>
   );
 }

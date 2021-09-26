@@ -1,17 +1,16 @@
-import Header from '../components/header';
+import Header from '../components/Header';
 import { Page, Spacer, Text } from "@geist-ui/react";
 import Link from "next/link";
 import { useRecoilValueLoadable } from "recoil";
 import { loggedInState } from "../store/loggedIn";
+import Footer from "../components/Footer";
 
 export default function Home(): JSX.Element {
   const { contents: loggedIn } = useRecoilValueLoadable(loggedInState)
 
   return (
     <Page>
-      <Page.Header>
-        <Header />
-      </Page.Header>
+      <Header />
       <Page.Content>
         {loggedIn ? (<>
           <Text h1>Feed</Text>
@@ -28,6 +27,7 @@ export default function Home(): JSX.Element {
         }
         {/* <Canvas /> */}
       </Page.Content>
+      <Footer />
     </Page>
   )
 }

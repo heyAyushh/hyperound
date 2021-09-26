@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "standard --fix",
     "prod": "pm2 start server.js",
-    "monitor": "pm2 monit"
+    "monitor": "pm2 monit",
+    "dev": "nodemon server.js"
   },
   "author": "team-undefined",
   "license": "UNLICENSED",
@@ -30,6 +31,7 @@
     "tweetnacl": "^1.0.3"
   },
   "devDependencies": {
+    "nodemon": "^2.0.13",
     "standard": "^16.0.3"
   }
 }

@@ -1,9 +1,10 @@
-import Header from '../components/header';
+import Header from '../components/Header';
 import { Page, Text, useToasts } from "@geist-ui/react";
 import React, { useState } from "react";
 import useSWR, { SWRConfig } from 'swr';
 import { fetcher } from "../helpers/fetcher";
 import axios from "axios";
+import Footer from "../components/Footer";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND;
 
@@ -64,12 +65,11 @@ export default function Explore({ fallback }): JSX.Element {
   return (
     <SWRConfig value={{ fallback }}>
       <Page>
-        <Page.Header>
-          <Header />
-        </Page.Header>
+        <Header />
         <Page.Content>
           <Article />
         </Page.Content>
+        <Footer />
       </Page>
     </SWRConfig>
   );

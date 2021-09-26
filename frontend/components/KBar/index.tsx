@@ -1,26 +1,36 @@
 import * as React from 'react';
-import { KBarResults, KBarSearch, KBarContent, KBarProvider, useKBar, KBarContext } from 'kbar';
+import { KBarResults, KBarSearch, KBarProvider, KBarContext, useKBar, KBarPortal, KBarPositioner, KBarAnimator } from 'kbar';
 import { useRouter } from "next/router";
 import { useTheme } from "next-themes";
-import { VisualState } from "../types/types";
-import { useRecoilState } from "recoil";
-import { kbarVisible } from "../store/kbar";
 
-const searchStyles = {
-  padding: '12px 16px',
-  fontSize: '16px',
-  width: '100%',
-  boxSizing: 'border-box' as React.CSSProperties['boxSizing'],
-  outline: 'none',
-  border: 'none',
-  // backdropFilter: 'blur(40px)',
-  background: 'var(--background)',
-  color: 'var(--foreground)',
+const searchStyle = {
+  padding: "12px 16px",
+  fontSize: "16px",
+  width: "100%",
+  boxSizing: "border-box" as React.CSSProperties["boxSizing"],
+  outline: "none",
+  border: "none",
+  background: "var(--background)",
+  color: "var(--foreground)",
+};
+
+const resultsStyle = {
+  maxHeight: 400,
+  overflow: "auto",
 };
 
 const App = ({ Component, pageProps }): JSX.Element => {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+
+  const animatorStyle = {
+    maxWidth: "500px",
+    width: "100%",
+    background: theme === 'light' ? 'white' : 'black',
+    borderRadius: "8px",
+    overflow: "hidden",
+    boxShadow: theme === 'light' ? '0 30px 60px rgba(0, 0, 0, 0.12)' : '0 16px 32px rgba(0,0,0,0.07)',
+  };
 
   return (
     <KBarProvider
@@ -115,36 +125,28 @@ const App = ({ Component, pageProps }): JSX.Element => {
         animations: {
           enterMs: 200,
           exitMs: 100,
-          maxContentHeight: 400,
         },
       }}
     >
-      <KBarContent
-        contentStyle={{
-          // backdropFilter: 'blur(20px)',
-          maxWidth: '400px',
-          width: '100%',
-          borderRadius: '8px',
-          backgroundColor: theme === 'light' ? 'white' : 'black',
-          overflow: 'hidden',
-          boxShadow: theme === 'light' ? '0 30px 60px rgba(0, 0, 0, 0.12)' : 'linear-gradient(rgb(167, 243, 208), rgb(52, 211, 153), rgb(126, 34, 206))',
-          transform: 'translateY(15%) scale(.85)',
-          // filter: 'blur(30px)',
-        }}
-        backgroundStyle={{
-          backdropFilter: 'blur(16px)'
-        }}
-      >
-        <KBarSearch
-          style={searchStyles}
-          placeholder="Type a command or search…"
-        />
-        <KBarResults
-          onRender={(action, handlers, state) => (
-            <Render action={action} handlers={handlers} state={state} />
-          )}
-        />
-      </KBarContent>
+      <KBarPortal>
+        <KBarPositioner
+          className="backdrop-blur-lg"
+        >
+          <KBarAnimator style={animatorStyle}>
+            <KBarSearch
+              style={searchStyle}
+              placeholder="Type a command or search…"
+            />
+            <KBarResults
+              style={resultsStyle}
+              onRender={(action, handlers, state) => (
+                <Render action={action} handlers={handlers} state={state} />
+              )}
+            />
+          </KBarAnimator>
+        </KBarPositioner>
+      </KBarPortal>
+
       <div>
         <Component {...pageProps} />
       </div>

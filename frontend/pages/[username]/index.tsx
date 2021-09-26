@@ -2,12 +2,15 @@ import { Avatar, Button, Grid, Page, Spacer, Card, useToasts, Description, Colla
 import { useRouter } from 'next/router';
 import { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
-import Header from "../../components/header";
+import Header from "../../components/Header";
 import { createToken } from "../../helpers/token";
 import { loggedInState, loggedInTwitterState, loggedInWalletState } from "../../store/loggedIn";
 import { tokenState } from "../../store/token";
 import Link from 'next/link';
 import { Divider } from "@geist-ui/react";
+import { useKBar } from "kbar";
+import { VisualState } from "../../types/types";
+import Footer from "../../components/Footer";
 
 export default function Post(): JSX.Element {
   const router = useRouter();
@@ -19,20 +22,27 @@ export default function Post(): JSX.Element {
   const [walletConnect, setWalletConnected] = useRecoilState(loggedInWalletState);
   const [token, setToken] = useRecoilState(tokenState);
   const [_, setToast] = useToasts();
+  const { visible } = useKBar(state => ({
+    visible: state.visualState !== VisualState.hidden
+  }));
 
   return (
     <Page >
-      <Page.Header>
-        <Header />
-      </Page.Header>
+      <Header />
       <Page.Content>
         <Grid.Container gap={2} justify="center">
           <Grid md={16}>
             <Card shadow width="100%">
               <h1>Welcome 👋</h1>
+
               <div>
                 <Button
                   loading={creatingToken}
+                  style={{
+                    filter: visible ?
+                      "blur(16px)" :
+                      "",
+                  }}
                   onClick={async () => {
                     try {
                       setCreatingToken(true);
@@ -67,7 +77,14 @@ export default function Post(): JSX.Element {
                 <br />
                 <br />
                 <Link href={'/' + username + '/live'} passHref>
-                  <Button type="secondary">go live</Button>
+                  <div >
+                    <Button type="secondary"
+                      style={{
+                        filter: visible ?
+                          "blur(16px)" :
+                          "",
+                      }}>go live</Button>
+                  </div>
                 </Link>
               </div>
             </Card>
@@ -87,17 +104,8 @@ export default function Post(): JSX.Element {
             </Card>
           </Grid>
         </ Grid.Container>
-      </Page.Content>
-      <Page.Footer className="">
-        <div className="">
-          <Divider />
-        </div>
-        <div >
-          <Card className='bg-dark-accent-2 w-auto h-20 mr-8'>
-            <Spacer h={2} />
-          </Card>
-        </div>
-      </Page.Footer>
+      </Page.Content >
+      <Footer />
     </Page >
   )
 }

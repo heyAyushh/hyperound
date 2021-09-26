@@ -2,7 +2,7 @@ import { Avatar, Page } from "@geist-ui/react";
 import { motion } from "framer-motion";
 import { useRouter } from 'next/router';
 import { useRecoilState } from "recoil";
-import Header from "../components/header";
+import Header from "./Header";
 import { loggedInState } from "../store/loggedIn";
 import Link from 'next/link';
 import { userState } from "../store/user";

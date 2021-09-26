@@ -129,7 +129,7 @@ module.exports = function (fastify, opts, done) {
         reply.code(400).send({ error: 'Invalid address sent' })
         return
       }
-      const newChallenge = `Hey, please sign this to verify your address! ${await nanoid(8)}`
+      const newChallenge = `Hey,\n please sign this message ${await nanoid(8)} &\n verify your connection to Hyperound!`
       const oldChallenge = await Challenge.findOne({ address: request.query.address })
       if (!oldChallenge) {
         await Challenge.create({
