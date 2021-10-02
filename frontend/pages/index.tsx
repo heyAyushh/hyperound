@@ -9,9 +9,9 @@ export default function Home(): JSX.Element {
   const { contents: loggedIn } = useRecoilValueLoadable(loggedInState)
 
   return (
-    <Page>
+    <div className="page">
       <Header />
-      <Page.Content>
+      <div>
         <div className="">
 
 
@@ -31,9 +31,9 @@ export default function Home(): JSX.Element {
           {/* <Canvas /> */}
 
         </div>
-      </Page.Content>
+      </div>
       <Footer />
-    </Page>
+    </div>
   )
 }
 

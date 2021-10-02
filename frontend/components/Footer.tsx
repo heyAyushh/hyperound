@@ -5,31 +5,26 @@ const Footer = (): JSX.Element => {
   const isMobile = useMediaQuery('mobile');
 
   return (
-    <Page.Footer className="">
-      <div >
+    <Page.Footer >
+      <div className=" mt-4" >
         <Divider />
         <Spacer h={1} />
 
         {isMobile ?
-          <div className="">
-            <Collapse.Group>
-              <Collapse title="Question A" scale={0.6}>
-                <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                  sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                  quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</Text>
-              </Collapse>
-              <Collapse title="Question B" scale={0.6}>
-                <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                  sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                  quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</Text>
-              </Collapse>
-            </Collapse.Group>
-          </div>
+          <Collapse.Group style={{ border: '1px solid white', }}>
+            <Collapse title="Question A" scale={0.6} >
+              <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</Text>
+            </Collapse>
+            <Collapse title="Question B" scale={0.6}>
+              <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</Text>
+            </Collapse>
+          </Collapse.Group>
           :
-          <Grid.Container gap={3}
-            justify="center"
-            height="100px"
-          >
+          <Grid.Container gap={3} justify="center">
             <Grid xs={22} md={7}>
               <Card width="100%">
                 <Text p b>Platform</Text>

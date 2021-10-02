@@ -9,17 +9,17 @@ import { useEffect } from "react";
 export default function Restricted(): JSX.Element {
 
   return (
-    <Page>
+    <div className="page">
       <Header />
-      <Page.Content>
+      <div>
         <div className="container p-4">
 
 
           <h1>You don&#39;t have access to this page.</h1>
 
         </div>
-      </Page.Content>
+      </div>
       <Footer />
-    </Page >
+    </div >
   )
 }

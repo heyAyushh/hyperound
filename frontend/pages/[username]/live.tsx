@@ -59,9 +59,7 @@ export default function Live(): JSX.Element {
   return (
     <div className=" ml-10 p-20">
       <Header />
-<div className="container p-4">
-
-      <>
+      <div className="container p-4">
 
         {isConnected ? <Room room_id={room} /> : <div style={{
           maxWidth: "500px",
@@ -82,9 +80,8 @@ export default function Live(): JSX.Element {
           }} className="btn-primary">Go Live</button>
         </div>}
 
-      </>
-      <Footer />
-</div>
+        <Footer />
+      </div>
 
     </div>
   )

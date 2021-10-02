@@ -4,17 +4,14 @@ import Footer from "../components/Footer";
 
 export default function Home(): JSX.Element {
   return (
-    <Page>
+    <div className="page">
       <Header />
-      <Page.Content>
+      <div>
         <div className="container p-4">
-
-
           <h1 className="font-extrabold text-9xl m-5"> कहाँ  ? </h1>
-
         </div>
-      </Page.Content>
+      </div>
       <Footer />
-    </Page>
+    </div>
   )
 }

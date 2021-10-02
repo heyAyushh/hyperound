@@ -14,15 +14,15 @@ export default function Post(): JSX.Element {
   const { username } = router.query;
 
   return (
-    <Page>
+    <div className="page">
       <Header />
-<div className="container p-4">
-
-      <>     <Spacer h={7} />
-        <h1>Creators</h1>
-      </>
-      <Footer />
-</div>
-    </Page>
+      <div className="container p-4">
+        <>
+          <Spacer h={7} />
+          <h1>Creators</h1>
+        </>
+        <Footer />
+      </div>
+    </div>
   )
 }

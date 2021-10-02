@@ -45,9 +45,9 @@ export default function Live(): JSX.Element {
   };
 
   return (
-    <Page>
+    <div className="page">
       <Header />
-      <Page.Content>
+      <div>
         <div className="container p-4">
 
 
@@ -55,8 +55,8 @@ export default function Live(): JSX.Element {
           {/* {isConnected ? <Room /> :  <JoinForm handleSubmit={handleSubmit} />} */}
 
         </div>
-      </Page.Content>
+      </div>
       <Footer />
-    </Page>
+    </div>
   );
 }
