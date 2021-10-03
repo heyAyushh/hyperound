@@ -4,10 +4,17 @@ const fastify = require('fastify')({ logger: true })
 // const oauthPlugin = require('fastify-oauth2')
 const grant = require('grant').fastify()
 const mongoose = require('mongoose')
+const Redis = require('ioredis');
+const fastifyCaching = require('fastify-caching');
 
-const SESSION_TTL = 604800 // 7 DAYS
+const { IS_PROD, IS_TEST, REDIS_URI, SESSION_TTL=604800 } =  process.env;
 
 fastify
+  .register(
+    fastifyCaching,
+    {privacy: fastifyCaching.privacy.NOCACHE},
+    (err) => { if (err) throw err }
+  )
   .register(require('fastify-cookie'))
   .register(require('@fastify/session'),
     {
