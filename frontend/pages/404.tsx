@@ -7,7 +7,12 @@ export default function Home(): JSX.Element {
     <Page>
       <Header />
       <Page.Content>
-        <h1 className="font-extrabold text-9xl m-5"> कहाँ  ? </h1>
+        <div className="container p-4">
+
+
+          <h1 className="font-extrabold text-9xl m-5"> कहाँ  ? </h1>
+
+        </div>
       </Page.Content>
       <Footer />
     </Page>

@@ -47,10 +47,15 @@ export default function Live(): JSX.Element {
   return (
     <Page>
       <Header />
+      <Page.Content>
+        <div className="container p-4">
 
-      {/* <Text h1 className={'font-extrabold md:text-9xl m-5 text-5xl'}>live streaming</Text> */}
-      {/* {isConnected ? <Room /> :  <JoinForm handleSubmit={handleSubmit} />} */}
 
+          {/* <Text h1 className={'font-extrabold md:text-9xl m-5 text-5xl'}>live streaming</Text> */}
+          {/* {isConnected ? <Room /> :  <JoinForm handleSubmit={handleSubmit} />} */}
+
+        </div>
+      </Page.Content>
       <Footer />
     </Page>
   );

@@ -6,7 +6,7 @@ const Footer = (): JSX.Element => {
 
   return (
     <Page.Footer className="">
-      <div className='mr-12 h-1'>
+      <div >
         <Divider />
         <Spacer h={1} />
 

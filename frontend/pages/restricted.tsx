@@ -12,9 +12,14 @@ export default function Restricted(): JSX.Element {
     <Page>
       <Header />
       <Page.Content>
-        <h1>You don&#39;t have access to this page.</h1>
+        <div className="container p-4">
+
+
+          <h1>You don&#39;t have access to this page.</h1>
+
+        </div>
       </Page.Content>
       <Footer />
-    </Page>
+    </Page >
   )
 }

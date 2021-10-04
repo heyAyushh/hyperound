@@ -60,9 +60,13 @@ export default function Post(): JSX.Element {
   return (
     <Page>
       <Header />
-      <Spacer h={7} />
       <Page.Content>
-        <h1>Toggle your settings here.</h1>
+        <div className="container p-4">
+          <>
+            <Spacer h={7} />
+            <h1>Toggle your settings here.</h1>
+          </>
+        </div>
       </Page.Content>
       <Footer />
     </Page>

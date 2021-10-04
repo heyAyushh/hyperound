@@ -32,7 +32,9 @@ function Article() {
   if (data) {
     return (
       <>
-        {data?.map((el, i) => <><h5 key={'postsFeed' + i}>{el.text}</h5> <br key={'postsFeedbr' + i} /></>)}
+        <div className="flex flex-col">
+          {data?.map((el, i) => <><h4 key={'postsFeed' + i}>{el.text}</h4> <br key={'postsFeedbr' + i} /></>)}
+        </div>
       </>
     );
   } else if (isValidating && !data && !error) {
@@ -65,10 +67,13 @@ export default function Explore({ fallback }): JSX.Element {
   return (
     <SWRConfig value={{ fallback }}>
       <Page>
-        <Header />
-        <Page.Content>
-          <Article />
-        </Page.Content>
+          <Header />
+          <Page.Content>
+            <div className=" flex flex-row">
+              <Article />
+              <Footer />
+            </div>
+          </Page.Content>
         <Footer />
       </Page>
     </SWRConfig>
