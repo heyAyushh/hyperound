@@ -82,7 +82,8 @@ export const WalletDialog: FC = ({
           wallets.map((wlt) => (
             <ButtonDropdown.Item
               key={wlt.name}
-              onClick={async () => {
+              onClick={async (event) => {
+                if (!event.defaultPrevented)
                 select(wlt.name);
               }}>
               <div className="flex flex-row w-full pl-4 hover:ml-2">
