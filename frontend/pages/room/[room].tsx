@@ -43,9 +43,9 @@ export default function JoinRoom(): JSX.Element {
   };
 
   return (
-    <Page>
+    <div className="page">
       {isConnected ? <Room room_id={room} /> : <JoinForm handleSubmit={handleSubmit} />}
       <Footer />
-    </Page >
+    </div >
   )
 }
