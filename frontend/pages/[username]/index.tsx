@@ -1,10 +1,10 @@
-import { Avatar, Button, Grid, Page, Spacer, Card, useToasts, Description, Collapse, Text, useMediaQuery } from "@geist-ui/react";
+import { Avatar, Button, Grid, Page, Spacer, Card, useToasts, Description, Collapse, Text, useMediaQuery, Tabs } from "@geist-ui/react";
 import { useRouter } from 'next/router';
 import { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 import Header from "../../components/Header";
 import { createToken } from "../../helpers/token";
-import { loggedInState, loggedInTwitterState, loggedInWalletState } from "../../store/loggedIn";
+import { loggedInState, loggedInWalletState } from "../../store/loggedIn";
 import { tokenState } from "../../store/token";
 import Link from 'next/link';
 import { Divider } from "@geist-ui/react";
@@ -13,6 +13,11 @@ import { VisualState } from "../../types/types";
 import Footer from "../../components/Footer";
 import { GetServerSidePropsContext } from "next";
 import { userState } from "../../store/user";
+import useSWR from "swr";
+import { fetcher } from "../../helpers/swr";
+import { getAvatarUrl } from "../../helpers/avatar";
+import { useTheme } from "next-themes";
+import createTokenButton from "../../helpers/solanaProgram";
 
 export async function getServerSideProps(context: GetServerSidePropsContext): Promise<any> {
   const { username } = context.params;
@@ -44,7 +49,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
   }
 
   return {
-    props: { profile: data }, // will be passed to the page component as props
+    props: { profile: data, }, // will be passed to the page component as props
   }
 }
 
@@ -53,9 +58,12 @@ export default function Post({ profile }): JSX.Element {
 
   const { username } = router.query;
 
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
+
   const [creatingToken, setCreatingToken] = useState(false);
   const [loggedIn, setTwitter] = useRecoilState(loggedInState);
-  const [user] = useRecoilState(userState);
+  const [currentUser] = useRecoilState(userState);
   const [walletConnect, setWalletConnected] = useRecoilState(loggedInWalletState);
   const [token, setToken] = useRecoilState(tokenState);
   const [_, setToast] = useToasts();
@@ -63,146 +71,194 @@ export default function Post({ profile }): JSX.Element {
     visible: state.visualState !== VisualState.hidden
   }));
 
-  const isMobile = useMediaQuery('mobile');
-  const isOwner = username === user.username;
+  const posts = useSWR(`${process.env.NEXT_PUBLIC_BACKEND}/posts/user/${username}`, fetcher);
 
-  console.log(profile)
+  const isMobile = useMediaQuery('mobile');
+  const isOwner = username === currentUser.username;
+
+  function SectionOne(): JSX.Element {
+
+    // cover & side menu settings
+    return (
+      <Grid.Container gap={2}
+        justify="center"
+        style={{}}
+      >
+
+        {/* header avatar - follow buttons*/}
+        <Grid md={16} >
+          <Card className="flex ">
+            {/* header avatar */}
+            {
+              profile.cover ?
+                <img src={profile.cover} alt="cover" style={{ width: "100%", height: "100%", objectFit: "cover", position: 'relative' }} />
+                // eslint-disable-next-line tailwindcss/no-custom-classname
+                :
+                <div className="flex ">
+                  <div
+                    style={{ height: "350px", width: "100%", }}
+                    // eslint-disable-next-line tailwindcss/no-custom-classname
+                    className="flex flex-1 items-end w-full h-full bg-light-accent-2 dark:bg-dark-accent-2"
+                  >
+                    <div className="flex-1 p-2">
+                      {profile.avatar ?
+                        <Avatar src={profile.avatar} scale={2} />
+                        : <Avatar
+                          src={getAvatarUrl(profile.username)}
+                          style={{ padding: '08px', backgroundColor: "#fff" }}
+                          scale={isMobile ? 6 : 10}
+                        />}
+                    </div>
+                  </div>
+                </div>
+            }
+            <Divider />
+            <Spacer />
+            {/*  follow buttons*/}
+            <div className="flex flex-col flex-wrap gap-4 justify-center">
+              <Button
+                className=""
+                loading={creatingToken}
+                style={{
+                  filter: visible ?
+                    "blur(16px)" :
+                    "",
+                }}
+                onClick={(e) => {
+                  if (e.defaultPrevented)
+                    createTokenButton(
+                      setCreatingToken,
+                      router,
+                      setToken,
+                      setToast,
+                    );
+                }}>{'Create your token'}</Button>
+              <Link href={'/' + username + '/live'} passHref>
+                <Button type="secondary"
+                  className=""
+                  style={{
+                    filter: visible ?
+                      "blur(16px)" :
+                      "",
+                  }}>go live</Button>
+              </Link>
+            </div>
+
+          </Card>
+          <Spacer h={3} />
+        </Grid>
+
+        {/* context menu */}
+        <Grid xs={24} md={8} h="100%" className={`${isMobile ? 'm-2' : ''}`}>
+          <Card shadow width="100%" >
+            <Spacer h={2} />
+            <Description title="Profile" content="Data about this section." />
+            <Spacer h={2} />
+            <Divider />
+            <Spacer h={1} />
+
+            <Grid.Container gap={2} className="items-center" direction="row">
+              <Grid >
+                <Text h3>Followers </Text>
+              </Grid>
+              <Grid >
+                <Avatar.Group count={12}>
+                  {/* <Avatar src={url} stacked /> */}
+                  <Avatar text="W" stacked />
+                  <Avatar text="Ana" stacked />
+                </Avatar.Group>
+              </Grid>
+            </Grid.Container>
+
+            <Grid.Container gap={2} className="items-center" direction="row">
+              {profile.followers.count ?
+                <>
+                  <Grid >
+                    <Text h3>Fans </Text>
+                  </Grid>
+                  <Grid >
+                    <Avatar.Group count={profile.followers.count}>
+                      {/* <Avatar src={url} stacked /> */}
+                      <Avatar text="W" stacked />
+                      <Avatar text="Ana" stacked />
+                    </Avatar.Group>
+                  </Grid>
+                </>
+                :
+                <>
+                  <Grid >
+                    <Text h3>No Fans </Text>
+                  </Grid>
+                  <Grid >
+                  </Grid>
+                </>
+              }
+            </Grid.Container>
+
+            <Grid.Container gap={2} className="items-center" direction="row">
+              {posts?.data?.length ?
+                <>
+                  <Grid >
+                    <Text h3>Posts </Text>
+                  </Grid>
+                  <Grid >
+                    <Text h3>{posts?.data?.length}</Text>
+                  </Grid>
+                </>
+                :
+                <>
+                  <Grid >
+                    <Text h3>No Posts </Text>
+                  </Grid>
+                  <Grid >
+                  </Grid>
+                </>
+              }
+            </Grid.Container>
+
+            {isOwner ?
+              <>
+                <Divider />
+                <br />
+                <h4>Profile</h4>
+                <h4>Hype Coins</h4>
+                <h4>Creator</h4>
+                <h4>Settings</h4>
+              </> : ""}
+            {/* Mint: {token.mint} */}
+          </Card>
+        </Grid>
+      </ Grid.Container>
+    )
+  }
 
   return (
-    <Page >
+    <div className="page">
       <Header />
-<div className="container p-4">
+      <div
+        style={{
+          marginBottom: `${isMobile ? "300px" : "120px"}`,
+          padding: isMobile ? "5px" : "40px"
+        }} >
 
-      <>
-        <>
-          <div className="h-full mb-52">
+        {SectionOne()}
 
-            <Grid.Container gap={2} justify="center">
-              <Grid md={16}>
-                <Card shadow width="100%">
-                  <h1>Welcome 👋</h1>
+        <Spacer h={1.5} />
 
-                  <div>
-                    <Button
-                      loading={creatingToken}
-                      style={{
-                        filter: visible ?
-                          "blur(16px)" :
-                          "",
-                      }}
-                      onClick={async () => {
-                        try {
-                          setCreatingToken(true);
-                          const data = await createToken();
+        <Card shadow className="">
+          <Tabs initialValue="1" >
+            <Tabs.Item label="about" value="1" scale={isMobile ? 1.5 : 6} >
+              <div className="">
+                <h3>Evenr</h3>
+              </div>
+            </Tabs.Item>
+            <Tabs.Item label="posts" value="2" scale={isMobile ? 1.5 : 6}>Between the Web browser and the server, numerous computers and machines relay the HTTP messages.</Tabs.Item>
+            <Tabs.Item label="drops" value="3" scale={isMobile ? 1.5 : 6}>Between the Web browser and the server, numerous computers and machines relay the HTTP messages.</Tabs.Item>
+          </Tabs>
+        </Card>
 
-                          setToken({
-                            signature: data.signature,
-                            transaction: data.transaction,
-                            mint: data.mint,
-                            exists: false,
-                          })
-
-                          const action = {
-                            name: 'Check on Explorer',
-                            handler: () => router.push(`https://explorer.solana.com/address/${data.mint.publicKey.toBase58()}?cluster=devnet`)
-                          }
-
-                          setToast({
-                            text: 'Your Mint was suceessful!, Added to your wallet.',
-                            type: 'success',
-                            actions: [action],
-                          })
-
-                          setCreatingToken(false);
-                        } catch (err) {
-                          setToast({
-                            text: err.message,
-                            type: 'error'
-                          })
-                        }
-                      }}>{'Create your token'}</Button>
-                    <br />
-                    <br />
-                    <Link href={'/' + username + '/live'} passHref>
-                      <div >
-                        <Button type="secondary"
-                          style={{
-                            filter: visible ?
-                              "blur(16px)" :
-                              "",
-                          }}>go live</Button>
-                      </div>
-                    </Link>
-                  </div>
-                </Card>
-              </Grid>
-              <Grid xs={24} md={8}>
-
-                <Card shadow width="100%" className="flex" >
-                  <h1>Hello Bitches</h1>
-                  <Spacer h={2} />
-                  <Description title="Profile" content="Data about this section." />
-                  <Spacer h={2} />
-                  <Divider />
-                  <Spacer h={1} />
-
-                  <Grid.Container gap={2} className="items-center" direction="row">
-                    <Grid >
-                      <Text h3>Followers </Text>
-                    </Grid>
-                    <Grid >
-                      <Avatar.Group count={12}>
-                        {/* <Avatar src={url} stacked /> */}
-                        <Avatar text="W" stacked />
-                        <Avatar text="Ana" stacked />
-                      </Avatar.Group>
-                    </Grid>
-                  </Grid.Container>
-
-                  <Grid.Container gap={2} className="items-center" direction="row">
-                    <Grid >
-                      <Text h3>Fans </Text>
-                    </Grid>
-                    <Grid >
-                      <Avatar.Group count={12}>
-                        {/* <Avatar src={url} stacked /> */}
-                        <Avatar text="W" stacked />
-                        <Avatar text="Ana" stacked />
-                      </Avatar.Group>
-                    </Grid>
-                  </Grid.Container>
-
-                  <Grid.Container gap={2} className="items-center" direction="row">
-                    <Grid >
-                      <Text h3>Posts </Text>
-                    </Grid>
-                    <Grid >
-                      <Avatar.Group count={12}>
-                        {/* <Avatar src={url} stacked /> */}
-                        <Avatar text="W" stacked />
-                        <Avatar text="Ana" stacked />
-                      </Avatar.Group>
-                    </Grid>
-                  </Grid.Container>
-
-                  {isOwner ?
-                    <>
-                      <Divider />
-                      <br />
-                      <h4>Profile</h4>
-                      <h4>Hype Coins</h4>
-                      <h4>Creator</h4>
-                      <h4>Settings</h4>
-                    </> : ""}
-                  {/* Mint: {token.mint} */}
-                </Card>
-              </Grid>
-            </ Grid.Container>
-          </div>
-        </>
-      </>
+      </div>
       <Footer />
-</div>
-    </Page >
+    </div >
   )
 }
