@@ -1,7 +1,35 @@
 const mongoose = require('mongoose')
 const { Post } = require('../models/post.js')
+const { User } = require('../models/user.js')
+const { uploadFileUrl, readFileUrl } = require('../helpers/hypeblobs.js')
 
 module.exports = function (fastify, opts, done) {
+  fastify.get('/posts', {
+    // get all posts
+  }, async (request, reply) => {
+    try {
+      const posts = await Post.find({}).populate('creator')
+      reply.send(posts)
+    } catch (err) {
+      reply.code(500).send(err)
+    }
+  })
+
+  fastify.get('/posts/user/:username', {
+    // preValidation: [fastify.authenticate],
+  }, async (request, reply) => {
+    try {
+      const user = await User.findOne({ username: request.params.username })
+      const posts = await Post.find({ creator: user._id })
+      reply.send(posts)
+    } catch (err) {
+      fastify.log.error('❎ error:' + err)
+      if (!reply.sent) {
+        reply.code(400).send()
+      };
+    }
+  })
+
   fastify.post('/post', {
     preValidation: [fastify.authenticate],
     schema: {
@@ -33,10 +61,20 @@ module.exports = function (fastify, opts, done) {
         reply.code(403).send()
         return
       }
+      // const blurhash = await encodeImageToBlurhash();
+      // TODO @heyAyushh bhai isme url daal do
+      // const blurhash = await encodeImageToBlurhash();
+
       const newPost = await Post.create({
         creator: mongoose.Types.ObjectId(request.body.creator),
-        text: request.body.text,
-        content: request.body.content,
+        // featuring: request.body.featuring,
+        // text: request.body.text,
+        description: request.body.description,
+        title: request.body.title,
+        content: {
+          url: request.body.content,
+          // blurhash
+        },
         contentType: request.body.contentType,
         locked: request.body.locked
       })
@@ -46,6 +84,36 @@ module.exports = function (fastify, opts, done) {
       if (!reply.sent) {
         reply.code(400).send()
       }
+    }
+  })
+
+  fastify.get('/post/uploadUrl', {
+    preValidation: [fastify.authenticate]
+  }, async (req, reply) => {
+    // get upload url for post
+    try {
+      const urlData = uploadFileUrl();
+      if (urlData && urlData.error) {
+        throw new Error(urlData.error)
+      }
+      reply.send(urlData)
+    } catch (err) {
+      fastify.log.error('❎ error:' + err)
+      reply.code(500).send(err)
+    }
+  })
+
+  fastify.get('/post/readUrl/:contentId', {
+    preValidation: [fastify.authenticate]
+  }, async (req, reply) => {
+    // get upload url for post
+    try {
+      const contentId = req.params.contentId
+      const urlData = readFileUrl(contentId)
+      reply.send(urlData)
+    } catch (err) {
+      fastify.log.error('❎ error:' + err)
+      reply.code(500).send(err)
     }
   })
 
