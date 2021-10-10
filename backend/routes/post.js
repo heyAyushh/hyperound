@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const { Post } = require('../models/post.js')
 const { User } = require('../models/user.js')
 const { uploadFileUrl, readFileUrl } = require('../helpers/hypeblobs.js')
+const encodeImageToBlurhash = require('../helpers/blurhash.js')
 
 module.exports = function (fastify, opts, done) {
   fastify.get('/posts', {
