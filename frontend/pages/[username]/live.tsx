@@ -57,10 +57,10 @@ export default function Live(): JSX.Element {
   };
 
   return (
-    <Page>
+    <div className=" ml-10 p-20">
       <Header />
+      <div className="container p-4">
 
-      <Page.Content>
         {isConnected ? <Room room_id={room} /> : <div style={{
           maxWidth: "500px",
           marginLeft: "auto",
@@ -79,8 +79,10 @@ export default function Live(): JSX.Element {
             letterSpacing: "2px"
           }} className="btn-primary">Go Live</button>
         </div>}
-      </Page.Content>
-      <Footer />
-    </Page>
+
+        <Footer />
+      </div>
+
+    </div>
   )
 }

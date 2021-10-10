@@ -7,6 +7,18 @@ const userSchema = new mongoose.Schema({
     unique: true,
     default: nanoid
   },
+  bio: {
+    type: String,
+    default: '',
+    maxlength: 200
+  },
+  avatar: {
+    url: String,
+    // default: `${process.env.AVATAR_URL}/pixel-art-neutral/${nanoid(12)}.svg`
+  },
+  cover: {
+    type: String
+  },
   address: {
     type: String
   },

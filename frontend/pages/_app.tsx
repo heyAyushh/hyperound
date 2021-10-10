@@ -13,6 +13,8 @@ import KBar from "../components/KBar";
 import { SWRConfig } from "swr";
 import { fetcher } from "../helpers/swr";
 
+import "../styles/filepond.css";
+
 const Geist = ({ Component, pageProps, router }): JSX.Element => {
   const { theme } = useTheme() as { theme: 'light' | 'dark' };
 
@@ -34,10 +36,12 @@ const Geist = ({ Component, pageProps, router }): JSX.Element => {
             exit="pageExit"
             variants={{
               pageInitial: {
-                opacity: 0
+                opacity: 0,
+                overflowY: 'hidden',
               },
               pageAnimate: {
-                opacity: 1
+                opacity: 1,
+                overflowY: 'hidden',
               },
               pageExit: {
                 // filter: [
@@ -47,7 +51,7 @@ const Geist = ({ Component, pageProps, router }): JSX.Element => {
                 //   'hue-rotate(0) contrast(100%)'
                 // ],
                 opacity: 0
-              }
+              },
             }}>
             {/* // actual component goes inside */}
             <KBar Component={Component} pageProps={pageProps} />

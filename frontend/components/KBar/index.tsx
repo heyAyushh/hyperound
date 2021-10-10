@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { KBarResults, KBarSearch, KBarProvider, KBarContext, useKBar, KBarPortal, KBarPositioner, KBarAnimator, Action, ResultHandlers, ResultState } from 'kbar';
+import { KBarResults, KBarSearch, KBarProvider, KBarPortal, KBarPositioner, KBarAnimator, Action, ResultHandlers, ResultState } from 'kbar';
 import { useRouter } from "next/router";
 import { useTheme } from "next-themes";
 import { useMediaQuery } from "@geist-ui/react";
@@ -32,7 +32,6 @@ const App = ({ Component, pageProps }): JSX.Element => {
     marginRight: isMobile ? '32px' : '0px',
     background: theme === 'light' ? 'white' : 'black',
     borderRadius: "8px",
-    overflow: "hidden",
     boxShadow: theme === 'light' ? '0 30px 60px rgba(0, 0, 0, 0.12)' : '0 16px 32px rgba(0,0,0,0.07)',
   };
 
