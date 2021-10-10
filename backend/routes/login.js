@@ -6,9 +6,9 @@ const { Challenge } = require('../models/challenge.js')
 const { PublicKey } = require('@solana/web3.js')
 
 module.exports = function (fastify, opts, done) {
-  fastify.get('/login/twitter/done', {
+  fastify.post('/login/twitter/done', {
     schema: {
-      description: 'Internal endpoint to handle OAuth callback data',
+      description: 'Endpoint to receive Twitter data',
       response: {
         200: {
           description: 'Successful response',
@@ -54,7 +54,7 @@ module.exports = function (fastify, opts, done) {
     }
   }, async (request, reply) => {
     try {
-      const twitterResponse = request.session.grant.response
+      const twitterResponse = request.body
       const userQuery = await User.findOne(
         { 'twitter.id': twitterResponse.raw.user_id },
         { __v: 0, updatedAt: 0 })
@@ -72,13 +72,12 @@ module.exports = function (fastify, opts, done) {
           const userObj = await newUser.save()
           request.session.user_id = userObj._id
           const responseObj = { state: Buffer.from(JSON.stringify(userObj)).toString('base64'), twitter_auth: true }
-          reply.redirect(`https://${process.env.DOMAIN || process.env.BASE_URL}/auth/twitter/done?${querystring.stringify(responseObj)}`)
+          return responseObj
         } else {
           // check if user_id exists
           const idQuery = await User.findById(request.session.user_id)
           if (!idQuery) {
             request.session.user_id = undefined // who is this?!
-            reply.code(403).send()
             return
           }
           // user exists, connect account with twitter
@@ -87,18 +86,18 @@ module.exports = function (fastify, opts, done) {
           )
           request.session.touch()
           const responseObj = { state: Buffer.from(JSON.stringify(updatedUser)).toString('base64'), twitter_auth: true }
-          reply.redirect(`https://${process.env.DOMAIN || process.env.BASE_URL}/auth/twitter/done?${querystring.stringify(responseObj)}`)
+          return responseObj
         }
       } else {
         // twitter id exists, log in
         request.session.user_id = userQuery._id
         const responseObj = { state: Buffer.from(JSON.stringify(userQuery)).toString('base64'), twitter_auth: true }
-        reply.redirect(`https://${process.env.DOMAIN || process.env.BASE_URL}/auth/twitter/done?${querystring.stringify(responseObj)}`)
+        return responseObj
       }
     } catch (err) {
       fastify.log.error('❎ error:' + err)
       if (!reply.sent) {
-        reply.code(400).send()
+        reply.statusCode = 400
       }
     }
   })

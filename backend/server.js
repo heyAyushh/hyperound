@@ -4,15 +4,15 @@ const fastify = require('fastify')({ logger: true })
 // const oauthPlugin = require('fastify-oauth2')
 const grant = require('grant').fastify()
 const mongoose = require('mongoose')
-const Redis = require('ioredis');
-const fastifyCaching = require('fastify-caching');
+const Redis = require('ioredis')
+const fastifyCaching = require('fastify-caching')
 
-const { IS_PROD, IS_TEST, REDIS_URI, SESSION_TTL=604800 } =  process.env;
+const { IS_PROD, IS_TEST, REDIS_URI, SESSION_TTL = 604800 } = process.env
 
 fastify
   .register(
     fastifyCaching,
-    {privacy: fastifyCaching.privacy.NOCACHE},
+    { privacy: fastifyCaching.privacy.NOCACHE },
     (err) => { if (err) throw err }
   )
   .register(require('fastify-cookie'))
@@ -76,10 +76,7 @@ fastify.get('/', async (request, reply) => {
 })
 
 fastify.register(require('./helpers/authenticate'))
-fastify.register(require('./routes/login'))
-fastify.register(require('./routes/post'))
-fastify.register(require('./routes/feed'))
-fastify.register(require('./routes/profile'))
+fastify.register(require('./routes/index'))
 
 const start = async () => {
   try {
