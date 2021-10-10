@@ -88,10 +88,7 @@ fastify.get('/', async (request, reply) => {
 })
 
 fastify.register(require('./helpers/authenticate'))
-fastify.register(require('./routes/login'))
-fastify.register(require('./routes/post'))
-fastify.register(require('./routes/feed'))
-fastify.register(require('./routes/profile'))
+fastify.register(require('./routes/index'))
 
 const start = async () => {
   try {
