@@ -42,6 +42,18 @@ export default function JoinRoom(): JSX.Element {
     });
   };
 
+  useEffect(() => {
+    const handleRouteChange = (url, { shallow }) => {
+      hmsActions.leave();
+    }
+
+    router.events.on('routeChangeStart', handleRouteChange)
+
+    return () => {
+      router.events.off('routeChangeStart', handleRouteChange)
+    }
+  }, [])
+
   return (
     <Page>
       <Footer />

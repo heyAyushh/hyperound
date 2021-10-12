@@ -1,11 +1,12 @@
 import { useHMSActions, useHMSStore, selectIsConnectedToRoom } from "@100mslive/hms-video-react";
 import { Page, Spacer } from "@geist-ui/react";
 import { useRouter } from 'next/router';
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import { MdLiveTv } from "react-icons/md";
 import Room from "../../components/Live/Room";
 import Footer from "../../components/Footer";
+import { useBeforeUnload } from "react-use";
 
 const tokenEndpoint = process.env.NEXT_PUBLIC_HMS_TOKEN;
 
@@ -28,7 +29,7 @@ const addRoom = async () => {
     method: "POST"
   });
   const { room_id } = await response.json();
-  console.log(room_id)
+  console.log("room_id", room_id)
   return room_id;
 }
 
@@ -55,6 +56,18 @@ export default function Live(): JSX.Element {
       userName: username
     });
   };
+  
+  useEffect(() => {
+    const handleRouteChange = (url, { shallow }) => {
+      hmsActions.leave();
+    }
+
+    router.events.on('routeChangeStart', handleRouteChange)
+
+    return () => {
+      router.events.off('routeChangeStart', handleRouteChange)
+    }
+  }, [])
 
   return (
     <Page>
