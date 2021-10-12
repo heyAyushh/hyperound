@@ -1,5 +1,5 @@
 import Header from '../components/Header';
-import { Page, Text, useToasts } from "@geist-ui/react";
+import { Page, Text, useMediaQuery, useToasts } from "@geist-ui/react";
 import React, { useState } from "react";
 import useSWR, { SWRConfig } from 'swr';
 import { fetcher } from "../helpers/fetcher";
@@ -32,7 +32,9 @@ function Article() {
   if (data) {
     return (
       <>
-        {data?.map((el, i) => <><h5 key={'postsFeed' + i}>{el.text}</h5> <br key={'postsFeedbr' + i} /></>)}
+        <div className="flex flex-col">
+          {data?.map((el, i) => <><h4 key={'postsFeed' + i}>{el.text}</h4> <br key={'postsFeedbr' + i} /></>)}
+        </div>
       </>
     );
   } else if (isValidating && !data && !error) {
@@ -61,16 +63,20 @@ function Article() {
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export default function Explore({ fallback }): JSX.Element {
   const [isShown, setIsShown] = useState(false);
+  const isMobile = useMediaQuery('md', { match: "down" });
 
   return (
     <SWRConfig value={{ fallback }}>
-      <Page>
-        <Header />
-        <Page.Content>
-          <Article />
-        </Page.Content>
+      <div className="page">
+          <Header />
+          <div style={{ marginBottom: `${isMobile ? "300px" : "120px"}` }}>
+            <div className=" flex flex-row">
+              <Article />
+              <Footer />
+            </div>
+          </div>
         <Footer />
-      </Page>
+      </div>
     </SWRConfig>
   );
 }

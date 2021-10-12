@@ -1,12 +1,12 @@
 import { Page, Spacer } from "@geist-ui/react";
 import { useRouter } from 'next/router';
-import Footer from "../components/Footer";
-import Header from "../components/Header";
+import Footer from "../../components/Footer";
+import Header from "../../components/Header";
 
 export default function Post(): JSX.Element {
   const router = useRouter();
 
-  const { username } = router.query;
+  const { id } = router.query;
 
   return (
     <div className="page">
@@ -14,13 +14,15 @@ export default function Post(): JSX.Element {
       <div>
         <div className="container p-4">
 
+          <>
 
-          <Spacer h={7} />
-          <h1>Buy HypeCoins here</h1>
+            <Spacer h={7} />
+            <h1>Buy HypeCoins here</h1>
 
+          </>
           <Footer />
         </div>
       </div>
-    </div >
+    </div>
   )
 }

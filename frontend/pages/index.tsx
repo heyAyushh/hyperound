@@ -9,26 +9,31 @@ export default function Home(): JSX.Element {
   const { contents: loggedIn } = useRecoilValueLoadable(loggedInState)
 
   return (
-    <Page>
+    <div className="page">
       <Header />
-      <Page.Content>
-        {loggedIn ? (<>
-          <Text h1>Feed</Text>
-        </>) : (<>
-          <Spacer h={7} />
-          <h1 className="font-extrabold md:text-9xl m-5 text-2xl"> Namaste 🙏</h1>
-          <Link href="/explore" passHref>
-            <Text className="font-extrabold md:text-9xl m-5 text-2xl hover:cursor-text dark:hover:text-transparent hover:text-transparent text-black bg-clip-text bg-gradient-conic-l from-yellow-200 via-red-500 to-fuchsia-500"> Explore </Text>
-          </Link>
-          <Link href="/about-us" passHref>
-            <Text className="font-extrabold md:text-9xl m-5 text-2xl hover:cursor-text dark:hover:text-transparent hover:text-transparent text-black bg-clip-text bg-gradient-to-bl from-green-200 via-green-300 to-blue-500"> About Us </Text>
-          </Link>
-        </>)
-        }
-        {/* <Canvas /> */}
-      </Page.Content>
+      <div>
+        <div className="">
+
+
+          {loggedIn ? (<>
+            <Text h1>Feed</Text>
+          </>) : (<>
+            <Spacer h={7} />
+            <h1 className="font-extrabold md:text-9xl m-5 text-2xl"> Namaste 🙏</h1>
+            <Link href="/explore" passHref>
+              <Text className="font-extrabold md:text-9xl m-5 text-2xl hover:cursor-text dark:hover:text-transparent hover:text-transparent text-black bg-clip-text bg-gradient-conic-l from-yellow-200 via-red-500 to-fuchsia-500"> Explore </Text>
+            </Link>
+            <Link href="/about-us" passHref>
+              <Text className="font-extrabold md:text-9xl m-5 text-2xl hover:cursor-text dark:hover:text-transparent hover:text-transparent text-black bg-clip-text bg-gradient-to-bl from-green-200 via-green-300 to-blue-500"> About Us </Text>
+            </Link>
+          </>)
+          }
+          {/* <Canvas /> */}
+
+        </div>
+      </div>
       <Footer />
-    </Page>
+    </div>
   )
 }
 

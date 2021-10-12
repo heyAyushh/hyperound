@@ -3,13 +3,28 @@ const mongoose = require('mongoose')
 const postSchema = new mongoose.Schema({
   creator: {
     type: mongoose.ObjectId,
-    required: true
+    required: true,
+    ref: 'User'
   },
+  featuring: [{
+    type: mongoose.ObjectId,
+    required: true,
+    ref: 'User'
+  }],
   text: String,
-  content: String,
+  title: String,
+  description: String,
+  content: {
+    url: {
+      type: String
+    },
+    blurhash: {
+      type: String
+    }
+  },
   contentType: {
     type: String,
-    enum: ['image', 'embed']
+    enum: ['image', 'embed', 'video', 'text']
   },
   favorites: {
     count: {

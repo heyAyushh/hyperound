@@ -5,21 +5,7 @@
 * {
   /* default cursor  */
   cursor: crosshair;
-
-  /* no scrollbar */
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
 }
-
-body {
-  -ms-overflow-style: none;  /* Internet Explorer 10+ */
-  scrollbar-width: none;  /* Firefox */
-}
-
-body::-webkit-scrollbar { 
-  display: none;  /* Safari and Chrome */
-}
-
 
 .cursor {
   position: fixed;
@@ -70,4 +56,8 @@ kbd {
 .GiestButton {
   /* filter: blur(16px) */
   color: blueviolet;
+}
+
+.page {
+  @apply min-h-screen m-8 overflow-hidden relative;
 }
