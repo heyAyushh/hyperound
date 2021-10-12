@@ -2,6 +2,7 @@ import { useHMSStore, selectCameraStreamByPeerID, useHMSActions } from "@100msli
 import router from "next/router";
 import React, { useEffect } from "react";
 import { FiLogOut, FiExternalLink } from "react-icons/fi";
+import { AiOutlinePoweroff } from "react-icons/ai";
 
 export function HostVideo({peer, room_id}) {
 
@@ -41,6 +42,22 @@ export function HostVideo({peer, room_id}) {
                 paddingLeft: "10px",
                 paddingRight: "10px"
             }}>{peer.name}</p>
+
+            <button
+                onClick={() => {
+                    hmsActions.leave();
+                }}
+                style={{
+                    padding: "10px",
+                    backgroundColor: "#c50000",
+                    borderRadius: "5px",
+                    position: "absolute",
+                    right: "60px",
+                    bottom: "15px",
+                    fontWeight: "bolder"
+                }}
+            ><AiOutlinePoweroff /></button>
+            
             <button
                 onClick={() => {
                     const a = document.createElement("a");
@@ -50,7 +67,7 @@ export function HostVideo({peer, room_id}) {
                 }}
                 style={{
                     padding: "10px",
-                    backgroundColor: "#FF0080",
+                    backgroundColor: "#000",
                     borderRadius: "5px",
                     position: "absolute",
                     right: "20px",
