@@ -4,6 +4,8 @@ import { useRouter } from "next/router";
 import { useTheme } from "next-themes";
 import { useMediaQuery } from "@geist-ui/react";
 import { Home, Aperture, Briefcase, Film } from "@geist-ui/react-icons";
+import { useRecoilValue } from "recoil";
+import { userState } from "../../store/user";
 
 const searchStyle = {
   padding: "12px 16px",
@@ -24,6 +26,9 @@ const resultsStyle = {
 const App = ({ Component, pageProps }): JSX.Element => {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+
+  const { username, isCreator } = useRecoilValue(userState)
+
   const isMobile = useMediaQuery('mobile');
 
   const animatorStyle = {
@@ -32,7 +37,7 @@ const App = ({ Component, pageProps }): JSX.Element => {
     marginRight: isMobile ? '32px' : '0px',
     background: theme === 'light' ? 'white' : 'black',
     borderRadius: "8px",
-    boxShadow: theme === 'light' ? '0 30px 60px rgba(0, 0, 0, 0.12)' : '0 16px 32px rgba(0,0,0,0.07)',
+    boxShadow: theme === 'light' ? '0 30px 60px rgba(0, 0, 0, 0.12)' : '0px -1px 143px 31px rgba(250,240,240,0.2)',
   };
 
   return (
@@ -54,7 +59,7 @@ const App = ({ Component, pageProps }): JSX.Element => {
             keywords: 'back',
             section: 'Navigation',
             perform: () => router.push('/'),
-            icon: <Home className="text-dark-accent-2 m-2" size={20} />,
+            icon: <Home className="m-2 text-dark-accent-2" size={20} />,
             subtitle: "Browse the awesome feed!"
           },
           {
@@ -64,7 +69,7 @@ const App = ({ Component, pageProps }): JSX.Element => {
             keywords: 'help',
             section: 'Navigation',
             perform: () => router.push('/explore'),
-            icon: <Film className="text-dark-accent-2 m-2" size={20} />,
+            icon: <Film className="m-2 text-dark-accent-2" size={20} />,
             subtitle: "",
           },
           {
@@ -73,8 +78,8 @@ const App = ({ Component, pageProps }): JSX.Element => {
             shortcut: ['c'],
             keywords: 'email hello',
             section: 'Navigation',
-            perform: () => router.push('/creators'),
-            icon: <Briefcase className="text-dark-accent-2 m-2" size={20} />,
+            perform: () => isCreator && username ? router.push(`${username}/creator`) : router.push('/creators'),
+            icon: <Briefcase className="m-2 text-dark-accent-2" size={20} />,
             subtitle: "",
           },
           {
@@ -85,7 +90,7 @@ const App = ({ Component, pageProps }): JSX.Element => {
             section: 'Navigation',
             // perform: () => window.open('https://twitter.com/timcchang', '_blank'),
             perform: () => router.push('/coins'),
-            icon: <Aperture className="text-dark-accent-2 m-2" size={20} />,
+            icon: <Aperture className="m-2 text-dark-accent-2" size={20} />,
             subtitle: "Buy, Sell, Check Balance",
           },
           {

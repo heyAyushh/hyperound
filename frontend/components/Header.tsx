@@ -2,27 +2,29 @@ import ThemeSwitch from './themeSwitcher'
 import { Layers, Sidebar } from '@geist-ui/react-icons'
 import { Wallet } from "./WalletAdapter/Wallet"
 import React, { useEffect } from "react"
-import { Button, Drawer, Spacer, Page, Link } from "@geist-ui/react"
+import { Button, Drawer, Spacer, Page } from "@geist-ui/react"
+import Link from "next/link";
 import LoggedIn from "./LoggedIn"
 import KbarButton from "./KBar/button"
 import { useRecoilState } from "recoil"
 import { mobileNavbarVisiblityState } from "../store/mobileNavbar"
-import DynamicMenu, {MenuItem} from 'react-animated-menu'
+import DynamicMenu, { MenuItem } from 'react-animated-menu'
+import LogoComponent from "./Logo"
 
 const Header = (): JSX.Element => {
   const [state, setState] = useRecoilState(mobileNavbarVisiblityState);
 
   const Brand = () => (
-    <Link href="/" >
+    <Link href="/" passHref>
       <div className="flex flex-row items-stretch">
-        <div className="self-center pr-4">
-          <Layers />
+        <div className="self-center pt-2">
+          <LogoComponent />
         </div>
-        <div className="self-auto pt-3">
-          <h3 className="hover:underline text">hyperound</h3>
-        </div>
+        {/* <div className="self-auto pt-3">
+          <h3 className="font-bold hover:underline">hyperound</h3>
+        </div> */}
       </div>
-    </Link>
+    </Link >
   );
 
   const settingPaths = [{
@@ -94,7 +96,7 @@ const Header = (): JSX.Element => {
                         {dashboardPaths.map(p => (
                           // <li key={p.route}>
                           //   <Link to={`/${p.route}/`} {...getLinkProps()}>
-                            p.label
+                          p.label
                           //   </Link>
                           // </li>
                         ))}
@@ -113,9 +115,9 @@ const Header = (): JSX.Element => {
                       <ul {...getMenuProps()}>
                         {settingPaths.map(p => (
                           <li key={p.route}>
-                            <Link to={`${p.route}/`} {...getLinkProps()}>
+                            {/* <Link to={`${p.route}/`} {...getLinkProps()}>
                               {p.label}
-                            </Link>
+                            </Link> */}
                           </li>
                         ))}
                       </ul>
@@ -124,7 +126,7 @@ const Header = (): JSX.Element => {
                 </MenuItem>
               </DynamicMenu>
             </aside>
-            
+
 
             <div className="flex flex-col gap-8 justify-around items-center h-full">
               <div> <Wallet /> </div>
