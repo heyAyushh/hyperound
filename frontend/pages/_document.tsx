@@ -8,7 +8,7 @@ class SITEDocument extends Document {
     styles: JSX.Element;
     html: string;
     head?: JSX.Element[];
-}> {
+  }> {
     const initialProps = await Document.getInitialProps(ctx)
     const styles = CssBaseline.flush()
 
@@ -27,7 +27,11 @@ class SITEDocument extends Document {
   render(): JSX.Element {
     return (
       <Html lang={SITE.language}>
-        <Head />
+        <Head >
+          <meta charSet="utf-8" />
+          {/* apple touch icon */}
+          <link rel="apple-touch-icon" sizes="57x57" href={'/apple-touch-icon.png'} />
+        </Head>
         <body>
           <Main />
           <NextScript />
