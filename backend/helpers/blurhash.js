@@ -1,6 +1,6 @@
 const sharp = require("sharp");
 const { encode } = require("blurhash");
-const request = require('request');
+const { request } = require('undici');
 
 const encodeImageToBlurhash = url =>
   new Promise((resolve, reject) => {
