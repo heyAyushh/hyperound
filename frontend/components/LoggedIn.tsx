@@ -13,17 +13,6 @@ export default function LoggedIn(): JSX.Element {
   const [isLoggedIn, setIsLoggedIn] = useRecoilState(loggedInState);
   const [user, _setUser] = useRecoilState(userState);
 
-  function makeid(length) {
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    for (let i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() *
-        charactersLength));
-    }
-    return result;
-  }
-
   const avatarUrl = useMemo(() => getAvatarUrl(user.username), [user.username])
 
   return (
