@@ -18,6 +18,7 @@ import { fetcher } from "../../helpers/swr";
 import { getAvatarUrl } from "../../helpers/avatar";
 import { useTheme } from "next-themes";
 import createTokenButton from "../../helpers/solanaProgram";
+import { motion } from 'framer-motion';
 
 export async function getServerSideProps(context: GetServerSidePropsContext): Promise<any> {
   const { username } = context.params;
@@ -73,49 +74,49 @@ export default function Post({ profile }): JSX.Element {
 
   const posts = useSWR(`${process.env.NEXT_PUBLIC_BACKEND}/posts/user/${username}`, fetcher);
 
-  const isMobile = useMediaQuery('mobile');
+  const isMobile = useMediaQuery('xs');
   const isOwner = username === currentUser.username;
+  const isCreator = currentUser.isCreator;
 
   function SectionOne(): JSX.Element {
 
     // cover & side menu settings
     return (
-      <Grid.Container gap={2}
-        justify="center"
-        style={{}}
+      <Grid.Container
+
+
+        justify='space-between'
       >
 
-        {/* header avatar - follow buttons*/}
-        <Grid md={16} >
-          <Card className="flex ">
-            {/* header avatar */}
+        {/* header & avatar - follow buttons*/}
+        <Grid xs={24} md={17} style={{ width: isMobile ? '300px' : '100%' }}>
+          <Card style={{ width: isMobile ? '300px' : '100%' }} >
+            {/* header & avatar */}
             {
               profile.cover ?
                 <img src={profile.cover} alt="cover" style={{ width: "100%", height: "100%", objectFit: "cover", position: 'relative' }} />
                 // eslint-disable-next-line tailwindcss/no-custom-classname
                 :
-                <div className="flex ">
-                  <div
-                    style={{ height: "350px", width: "100%", }}
-                    // eslint-disable-next-line tailwindcss/no-custom-classname
-                    className="flex flex-1 items-end w-full h-full bg-light-accent-2 dark:bg-dark-accent-2"
-                  >
-                    <div className="flex-1 p-2">
-                      {profile.avatar ?
-                        <Avatar src={profile.avatar} scale={2} />
-                        : <Avatar
-                          src={getAvatarUrl(profile.username)}
-                          style={{ padding: '08px', backgroundColor: "#fff" }}
-                          scale={isMobile ? 6 : 10}
-                        />}
-                    </div>
+                <div
+                  style={{ height: "350px", }}
+                  // eslint-disable-next-line tailwindcss/no-custom-classname
+                  className="flex flex-1 items-end bg-light-accent-2 dark:bg-dark-accent-2"
+                >
+                  <div className="flex-1 p-2">
+                    {profile.avatar ?
+                      <Avatar src={profile.avatar} scale={2} />
+                      : <Avatar
+                        src={getAvatarUrl(profile.username)}
+                        style={{ padding: '08px', backgroundColor: "#fff" }}
+                        scale={isMobile ? 6 : 10}
+                      />}
                   </div>
                 </div>
             }
             <Divider />
             <Spacer />
             {/*  follow buttons*/}
-            <div className="flex flex-col flex-wrap gap-4 justify-center">
+            <div className={`flex flex-col flex-grow-0 gap-4 justify-center ${isMobile ? '' : 'w-3/12'}`}>
               <Button
                 className=""
                 loading={creatingToken}
@@ -132,7 +133,9 @@ export default function Post({ profile }): JSX.Element {
                       setToken,
                       setToast,
                     );
-                }}>{'Create your token'}</Button>
+                }}>
+                {'Create your token'}
+              </Button>
               <Link href={'/' + username + '/live'} passHref>
                 <Button type="secondary"
                   className=""
@@ -149,7 +152,7 @@ export default function Post({ profile }): JSX.Element {
         </Grid>
 
         {/* context menu */}
-        <Grid xs={24} md={8} h="100%" className={`${isMobile ? 'm-2' : ''}`}>
+        <Grid xs={24} md={7} h="100%" className={`${isMobile ? '' : 'm-2'}`}>
           <Card shadow width="100%" >
             <Spacer h={2} />
             <Description title="Profile" content="Data about this section." />
@@ -220,10 +223,34 @@ export default function Post({ profile }): JSX.Element {
               <>
                 <Divider />
                 <br />
-                <h4>Profile</h4>
-                <h4>Hype Coins</h4>
-                <h4>Creator</h4>
-                <h4>Settings</h4>
+                {/* <Link href={`${username}/profile`} passHref>
+                  <motion.div
+                   whileHover={{ scale: 0.96 }}
+                   className=" hover:text-transparent dark:hover:text-transparent bg-clip-text bg-gradient-to-tr from-red-200 via-red-300 to-yellow-200 ">
+                    <h4>Profile</h4>
+                  </motion.div>
+                </Link> */}
+                <Link href={"/coins"} passHref>
+                  <motion.div
+                    whileHover={{ scale: 0.96 }}
+                    className=" hover:text-transparent dark:hover:text-transparent bg-clip-text bg-gradient-to-tr from-green-200 via-green-400 to-purple-700">
+                    <h4 >Hype Coins</h4>
+                  </motion.div>
+                </Link>
+                <Link href={`/creators`} passHref>
+                  <motion.div
+                    whileHover={{ scale: 0.96, }}
+                    className="hover:text-transparent dark:hover:text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-red-600">
+                    <h4>Creator</h4>
+                  </motion.div>
+                </Link>
+                <Link href={`${username}/settings`} passHref>
+                  <motion.div
+                    whileHover={{ scale: 0.96, }}
+                    className="flex flex-wrap hover:text-transparent dark:hover:text-transparent bg-clip-text bg-gradient-to-bl from-indigo-900 via-indigo-400 to-indigo-900">
+                    <h4>Settings</h4>
+                  </motion.div>
+                </Link>
               </> : ""}
             {/* Mint: {token.mint} */}
           </Card>
@@ -232,9 +259,32 @@ export default function Post({ profile }): JSX.Element {
     )
   }
 
+  const [tabValue, setTabValue] = useState('2');
+
+  function SectionTwo(): JSX.Element {
+
+    return <div>
+      <Grid xs={24} md={24} >
+
+        <Card >
+          <Tabs value={tabValue} onChange={(v) => setTabValue(v)}>
+            <Tabs.Item font={!isMobile ? "300%" : "200%"} label="about" value="1" />
+            <Tabs.Item font={!isMobile ? "300%" : "200%"} label="posts" value="2" />
+            <Tabs.Item font={!isMobile ? "300%" : "200%"} label="drops" value="3" />
+          </Tabs>
+          <div className=" min-h-screen">
+            Tab Display {tabValue}
+          </div>
+        </Card>
+      </Grid>
+    </div>
+  }
+
   return (
     <div className="page">
-      <Header />
+      <div className="mr-2">
+        <Header />
+      </div>
       <div
         style={{
           marginBottom: `${isMobile ? "300px" : "120px"}`,
@@ -245,17 +295,7 @@ export default function Post({ profile }): JSX.Element {
 
         <Spacer h={1.5} />
 
-        <Card shadow className="">
-          <Tabs initialValue="1" >
-            <Tabs.Item label="about" value="1" scale={isMobile ? 1.5 : 6} >
-              <div className="">
-                <h3>Evenr</h3>
-              </div>
-            </Tabs.Item>
-            <Tabs.Item label="posts" value="2" scale={isMobile ? 1.5 : 6}>Between the Web browser and the server, numerous computers and machines relay the HTTP messages.</Tabs.Item>
-            <Tabs.Item label="drops" value="3" scale={isMobile ? 1.5 : 6}>Between the Web browser and the server, numerous computers and machines relay the HTTP messages.</Tabs.Item>
-          </Tabs>
-        </Card>
+        {SectionTwo()}
 
       </div>
       <Footer />
