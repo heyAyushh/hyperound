@@ -66,3 +66,36 @@ kbd {
 .page {
   @apply min-h-screen m-8 overflow-hidden relative;
 }
+
+.tabs{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circle-ripple-green {
+  background-color: #1a8d6b;
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  -webkit-animation: ripple 0.7s linear infinite;
+          animation: ripple 0.7s linear infinite;
+}
+
+@-webkit-keyframes ripple {
+  0% {
+    box-shadow: 0 0 0 0 rgba(101, 255, 120, 0.02), 0 0 0 0.2em rgba(101, 255, 120, 0.04), 0 0 0 0.6em rgba(101, 255, 120, 0.03), 0 0 0 1.5em rgba(101, 255, 120, 0.03);
+  }
+  100% {
+    box-shadow: 0 0 0 2em rgba(101, 255, 120, 0.02), 0 0 0 0.6em rgba(101, 255, 120, 0.04), 0 0 0 1.5em rgba(101, 255, 120, 0.03), 0 0 0 2.4em rgba(101, 255, 120, 0);
+  }
+}
+
+@keyframes ripple {
+  0% {
+    box-shadow: 0 0 0 0 rgba(101, 255, 120, 0.3), 0 0 0 0.2em rgba(101, 255, 120, 0.3), 0 0 0 0.6em rgba(101, 255, 120, 0.3), 0 0 0 1em rgba(101, 255, 120, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 0.2em rgba(101, 255, 120, 0.3), 0 0 0 0.6em rgba(101, 255, 120, 0.3), 0 0 0 1em rgba(101, 255, 120, 0.3), 0 0 0 1.2em rgba(101, 255, 120, 0);
+  }
+}
