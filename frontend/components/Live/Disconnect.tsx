@@ -1,7 +1,7 @@
 import { useHMSActions, useHMSStore, selectIsConnectedToRoom } from "@100mslive/hms-video-react";
 import { useEffect } from "react";
 
-export const Disconnect = () => {
+export const Disconnect = (): null => {
     const hmsActions = useHMSActions();
     const isConnected = useHMSStore(selectIsConnectedToRoom);
 
