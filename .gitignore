@@ -3,6 +3,8 @@ learn-web3-dapp/
 ts/
 test-ledger/
 
+.vscode/
+
 # Logs
 logs
 *.log

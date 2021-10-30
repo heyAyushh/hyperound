@@ -97,6 +97,7 @@ module.exports = {
       boxShadow: {
         small: '0 5px 10px rgba(0, 0, 0, 0.12)',
         medium: '0 8px 30px rgba(0, 0, 0, 0.12)',
+        dark: '0 10px 15px -3px rgba(255, 255, 255, 0.1), 0 4px 6px -2px rgba(255, 255, 255, 0.05)',
       },
       fontFamily: {
         sans: ['Inter var', fontFamily.sans],
@@ -112,7 +113,8 @@ module.exports = {
         'gradient-conic-tl': 'conic-gradient(at top left, var(--tw-gradient-stops))',
         'gradient-conic-br': 'conic-gradient(at bottom right, var(--tw-gradient-stops))',
         'gradient-conic-bl': 'conic-gradient(at bottom left, var(--tw-gradient-stops))',
-      }
+      },
+      animation: ['hover', 'focus'],
     },
   },
   variants: {

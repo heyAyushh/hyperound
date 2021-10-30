@@ -16,14 +16,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
   const data = await res.json()
   // or use context.resolvedUrl for conditional redirect
   // if(context.resolvedUrl == "/")
-  if (data.statusCode === 404) {
-    return {
-      redirect: {
-        destination: '/404',
-        permanent: true,
-      },
-    }
-  }
+  // if (data.statusCode === 404) {
+  //   return {
+  //     redirect: {
+  //       destination: '/404',
+  //       permanent: true,
+  //     },
+  //   }
+  // }
 
   return {
     props: {}, // will be passed to the page component as props

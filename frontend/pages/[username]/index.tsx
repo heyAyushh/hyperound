@@ -83,8 +83,6 @@ export default function Post({ profile }): JSX.Element {
     // cover & side menu settings
     return (
       <Grid.Container
-
-
         justify='space-between'
       >
 

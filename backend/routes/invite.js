@@ -66,7 +66,6 @@ module.exports = function (fastify, opts, done) {
           const user = request.session.user_id;
 
           const redeemed_by =  invite.redeems && invite.redeems.redeemed_by ? invite.redeems.redeemed_by : [];
-          console.log(redeemed_by)
 
           await Invite.findOneAndUpdate({ code }, {
             reedeems: {

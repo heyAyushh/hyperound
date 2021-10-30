@@ -8,33 +8,40 @@
     "lint": "standard --fix",
     "prod": "pm2 start server.js",
     "monitor": "pm2 monit",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "debug": "nodemon --inspect server.js"
   },
   "author": "team-undefined",
   "license": "UNLICENSED",
   "dependencies": {
-    "@fastify/session": "^6.1.1",
-    "@mgcrea/fastify-session-redis-store": "^0.9.1",
-    "@solana/web3.js": "^1.24.1",
-    "axios": "^0.21.1",
+    "@azure/storage-blob": "^12.8.0",
+    "@fastify/session": "^6.2.1",
+    "@mgcrea/fastify-session-redis-store": "^0.11.0",
+    "@solana/web3.js": "^1.29.2",
+    "axios": "^0.23.0",
+    "blurhash": "^1.1.4",
+    "connect-redis": "^6.0.0",
     "dotenv": "^10.0.0",
-    "fastify": "^3.20.2",
+    "fastify": "^3.22.1",
     "fastify-caching": "^6.1.0",
     "fastify-cookie": "^5.3.1",
     "fastify-cors": "^6.0.2",
-    "fastify-oauth2": "^4.2.3",
     "fastify-passport": "^0.4.3",
     "fastify-plugin": "^3.0.0",
-    "fastify-swagger": "^4.9.0",
-    "grant": "^5.4.16",
-    "ioredis": "^4.27.9",
-    "mongoose": "^5.13.7",
-    "nanoid": "^3.1.25",
-    "pm2": "^5.1.1",
-    "tweetnacl": "^1.0.3"
+    "fastify-swagger": "^4.12.5",
+    "grant": "^5.4.18",
+    "ioredis": "^4.28.0",
+    "mongoose": "^6.0.11",
+    "nanoid": "^3.1.30",
+    "oauth": "^0.9.15",
+    "pino-pretty": "^7.1.0",
+    "pm2": "^5.1.2",
+    "sharp": "^0.29.1",
+    "tweetnacl": "^1.0.3",
+    "undici": "^4.8.1"
   },
   "devDependencies": {
-    "nodemon": "^2.0.13",
-    "standard": "^16.0.3"
+    "nodemon": "^2.0.14",
+    "standard": "^16.0.4"
   }
 }
