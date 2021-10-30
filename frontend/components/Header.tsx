@@ -2,27 +2,29 @@ import ThemeSwitch from './themeSwitcher'
 import { Layers, Sidebar } from '@geist-ui/react-icons'
 import { Wallet } from "./WalletAdapter/Wallet"
 import React, { useEffect } from "react"
-import { Button, Drawer, Spacer, Page, Link } from "@geist-ui/react"
+import { Button, Drawer, Spacer, Page } from "@geist-ui/react"
+import Link from "next/link";
 import LoggedIn from "./LoggedIn"
 import KbarButton from "./KBar/button"
 import { useRecoilState } from "recoil"
 import { mobileNavbarVisiblityState } from "../store/mobileNavbar"
-import DynamicMenu, {MenuItem} from 'react-animated-menu'
+import DynamicMenu, { MenuItem } from 'react-animated-menu'
+import LogoComponent from "./Logo"
 
 const Header = (): JSX.Element => {
   const [state, setState] = useRecoilState(mobileNavbarVisiblityState);
 
   const Brand = () => (
-    <Link href="/" >
+    <Link href="/" passHref>
       <div className="flex flex-row items-stretch">
-        <div className="self-center pr-4">
-          <Layers />
+        <div className="self-center ">
+          <LogoComponent />
         </div>
-        <div className="self-auto pt-3">
-          <h3 className="hover:underline text">hyperound</h3>
-        </div>
+        {/* <div className="self-auto pt-3">
+          <h3 className="font-bold hover:underline">hyperound</h3>
+        </div> */}
       </div>
-    </Link>
+    </Link >
   );
 
   const settingPaths = [{
@@ -36,7 +38,7 @@ const Header = (): JSX.Element => {
   }];
 
   return (
-    <Page.Header>
+    <div>
       {/* For Desktops */}
       <div className="hidden sm:flex sm:flex-row justify-between items-center w-full backdrop-blur-3xl">
         <h2 className="text-2xl md:text-4xl font-bold tracking-tight md:tracking-tighter leading-tight">
@@ -50,17 +52,18 @@ const Header = (): JSX.Element => {
           <div className="pr-6">
             <KbarButton />
           </div>
-          <div className="pr-8">
+          <div className="pr-6">
             <ThemeSwitch />
           </div>
-          <div>
+          <div className="pr-2">
             <LoggedIn />
           </div>
         </div>
       </div>
+
       {/* For Mobiles */}
-      <div className="sm:hidden">
-        <div className="flex flex-row justify-around items-baseline w-full">
+      <div className="sm:hidden -mr-8 -ml-8">
+        <div className="flex flex-row justify-around items-center mb-6 w-full">
           <div>
             <Brand />
           </div>
@@ -94,7 +97,7 @@ const Header = (): JSX.Element => {
                         {dashboardPaths.map(p => (
                           // <li key={p.route}>
                           //   <Link to={`/${p.route}/`} {...getLinkProps()}>
-                            p.label
+                          p.label
                           //   </Link>
                           // </li>
                         ))}
@@ -113,9 +116,9 @@ const Header = (): JSX.Element => {
                       <ul {...getMenuProps()}>
                         {settingPaths.map(p => (
                           <li key={p.route}>
-                            <Link to={`${p.route}/`} {...getLinkProps()}>
+                            {/* <Link to={`${p.route}/`} {...getLinkProps()}>
                               {p.label}
-                            </Link>
+                            </Link> */}
                           </li>
                         ))}
                       </ul>
@@ -124,9 +127,9 @@ const Header = (): JSX.Element => {
                 </MenuItem>
               </DynamicMenu>
             </aside>
-            
 
-            <div className="flex flex-col gap-8 justify-around items-center h-full">
+
+            <div className="flex flex-col justify-items-end items-center h-full">
               <div> <Wallet /> </div>
               <div> <LoggedIn /> </div >
               <div> <KbarButton /> </div>
@@ -135,8 +138,7 @@ const Header = (): JSX.Element => {
           </Drawer.Content>
         </Drawer>
       </div>
-
-    </Page.Header>
+    </div>
   )
 }
 

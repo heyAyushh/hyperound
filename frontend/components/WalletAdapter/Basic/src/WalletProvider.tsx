@@ -33,8 +33,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
           type: 'error',
         })
         return;
-      }
-      if (error?.message) {
+      } else if (error?.message) {
         setToast({
           text: error.message,
           type: 'error',
@@ -62,6 +61,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
     const [loggedIn, setLoggedin] = useRecoilState(loggedInState);
     const [loggedInWallet, setloggedInWallet] = useRecoilState(loggedInWalletState);
     const [user, setUser] = useRecoilState(userState);
+    const [provider, loggedInAlready] = getProvider();
 
     const walletsByName = useMemo(
       () =>
@@ -94,8 +94,6 @@ export const WalletProvider: FC<WalletProviderProps> = ({
 
     // wallet login verify for backend
     const signLoginString = async () => {
-      const [provider, loggedInAlready] = getProvider();
-
       if (provider && !loggedIn) {
         const challenge_req = await axios({
           method: "get",
@@ -117,6 +115,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
         const backend_res_raw = await axios({
           method: "post",
           url: `${process.env.NEXT_PUBLIC_BACKEND}/login/wallet/done`,
+          withCredentials: true,
           data: {
             address: provider ? provider.publicKey?.toBase58() : "",
             signature: signature_array
@@ -124,19 +123,25 @@ export const WalletProvider: FC<WalletProviderProps> = ({
         });
 
         const user = backend_res_raw.data;
-        setUser(user)
 
+        console.log('session', backend_res_raw);
+
+        setUser(user)
         setLoggedin(true);
         setloggedInWallet({
           publicKey: provider.publicKey?.toBase58(),
           provider: provider?.isPhantom,
           verified: true,
         });
+      }
+    }
 
-        setToast({
-          text: 'Connected Successfully!',
-          type: 'success'
-        })
+    const logoutBackend = async () => {
+      if (loggedIn) {
+        return axios({
+          method: "post",
+          url: `${process.env.NEXT_PUBLIC_BACKEND}/logout`,
+        });
       }
     }
 
@@ -149,20 +154,18 @@ export const WalletProvider: FC<WalletProviderProps> = ({
         setAutoApprove(adapter.autoApprove);
         setPublicKey(adapter.publicKey);
 
-        // if (localStorage.getItem('verifiedWallet') === 'false') {
-        //   setToast({
-        //     text: 'Connected Successfully!',
-        //     type: 'success'
-        //   })
-        // }
+        if (loggedInWallet?.publicKey === adapter?.publicKey) {
+          setToast({
+            text: 'Connected Successfully!',
+            type: 'success'
+          })
+        }
       } catch (err) {
-        console.log('wallet onconnect 141')
-        onError(err, setToast);
+        console.log('wallet onconnect 141');
         select(null);
-        setConnected(false);
       }
 
-    }, [adapter, select, setConnected, setAutoApprove, setPublicKey, onError, setToast, signLoginString]);
+    }, [adapter, select, setConnected, setAutoApprove, setPublicKey, setToast, signLoginString, loggedInWallet]);
 
     const onDisconnect = useCallback(() => reset(), [reset]);
 
@@ -171,16 +174,12 @@ export const WalletProvider: FC<WalletProviderProps> = ({
 
       if (!wallet || !adapter) {
         const error = new WalletNotSelectedError();
-        console.log('wallet not selected 156')
-        onError(error, setToast);
         throw error;
       }
       if (!ready) {
         window.open(wallet.url, '_blank');
 
         const error = new WalletNotReadyError();
-        console.log('wallet not ready 163')
-        onError(error, setToast);
         throw error;
       }
 
@@ -188,13 +187,12 @@ export const WalletProvider: FC<WalletProviderProps> = ({
       try {
         await adapter.connect();
       } catch (err) {
-        console.log('wallet not 175')
-        onError(err, setToast);
+        console.log('wallet connect', err);
       }
       finally {
         setConnecting(false);
       }
-    }, [connecting, disconnecting, connected, adapter, onError, ready, wallet, setConnecting, setToast]);
+    }, [connecting, disconnecting, connected, adapter, ready, wallet, setConnecting]);
 
     const disconnect = useCallback(async () => {
       if (disconnecting) return;
@@ -207,22 +205,37 @@ export const WalletProvider: FC<WalletProviderProps> = ({
       setDisconnecting(true);
       try {
         await adapter.disconnect();
-      } finally {
-        setDisconnecting(false);
+        await logoutBackend();
+
         setToast({
           text: 'Disconnected Successfully!',
           type: 'success',
         })
 
+      } catch (err) {
+        setToast({
+          text: 'Error logging out',
+          type: 'error',
+        });
+      } finally {
+
+        // Clear Login
+        setDisconnecting(false);
         setLoggedin(false);
         setloggedInWallet({
           verified: false,
           publicKey: null,
           provider: null
         });
+        setUser({
+          username: null,
+          userId: null,
+          isCreator: null,
+        });
+
         await select(null);
       }
-    }, [disconnecting, adapter, select, setDisconnecting, setToast, setLoggedin, setloggedInWallet]);
+    }, [disconnecting, adapter, select, setDisconnecting, setToast, setLoggedin, setloggedInWallet, logoutBackend, setUser]);
 
     const signTransaction = useCallback(
       async (transaction: Transaction) => {
@@ -303,15 +316,13 @@ export const WalletProvider: FC<WalletProviderProps> = ({
             await adapter.connect();
           } catch (error) {
             // Don't throw error, but onError will still be called
-            onError(error, setToast, 'Connection cancelled');
-            console.log(error)
             setWalletAutoConnect(false);
           } finally {
             setConnecting(false);
           }
         })();
       }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [autoConnect, adapter, ready, setConnecting]);
 
     return (

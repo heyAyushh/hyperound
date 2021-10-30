@@ -1,6 +1,9 @@
 learn-web3-dapp/
 .history/
 ts/
+test-ledger/
+
+.vscode/
 
 # Logs
 logs

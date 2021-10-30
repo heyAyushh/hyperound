@@ -6,7 +6,6 @@ import Header from "../../components/Header";
 import { MdLiveTv } from "react-icons/md";
 import Room from "../../components/Live/Room";
 import Footer from "../../components/Footer";
-import { useBeforeUnload } from "react-use";
 
 const tokenEndpoint = process.env.NEXT_PUBLIC_HMS_TOKEN;
 
@@ -56,7 +55,7 @@ export default function Live(): JSX.Element {
       userName: username
     });
   };
-  
+
   useEffect(() => {
     const handleRouteChange = (url, { shallow }) => {
       hmsActions.leave();
@@ -70,7 +69,7 @@ export default function Live(): JSX.Element {
   }, [])
 
   return (
-    <div className=" ml-10 p-20">
+    <div className="page">
       <Header />
       <div className="container p-4">
 
@@ -93,8 +92,8 @@ export default function Live(): JSX.Element {
           }} className="btn-primary">Go Live</button>
         </div>}
 
-        <Footer />
       </div>
+      <Footer />
 
     </div>
   )

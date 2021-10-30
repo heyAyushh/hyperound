@@ -9,20 +9,20 @@ import Footer from "../components/Footer";
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND;
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export async function getStaticProps() {
-  // `getStaticProps` is executed on the server side.
+// export async function getStaticProps() {
+//   // `getStaticProps` is executed on the server side.
 
-  const feedResponse = await axios.get(`${BACKEND_URL}/feed/latest`);
-  const feed = feedResponse.data;
+//   const feedResponse = await axios.get(`${BACKEND_URL}/feed/latest`);
+//   const feed = feedResponse.data;
 
-  return {
-    props: {
-      fallback: {
-        [`${BACKEND_URL}/feed/latest`]: feed
-      }
-    }
-  }
-}
+//   return {
+//     props: {
+//       fallback: {
+//         [`${BACKEND_URL}/feed/latest`]: feed
+//       }
+//     }
+//   }
+// }
 
 function Article() {
   // `data` will always be available as it's in `fallback`.

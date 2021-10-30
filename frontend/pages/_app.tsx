@@ -4,11 +4,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import '../styles/global.css';
 import Cursor from "../components/cursor";
 import {
-  RecoilRoot,
+  RecoilRoot, useRecoilValue,
 } from 'recoil';
 import { HMSRoomProvider, HMSThemeProvider } from "@100mslive/hms-video-react";
 import { Disconnect } from "../components/Live/Disconnect";
-import React from "react";
+import React, { useMemo } from "react";
 import KBar from "../components/KBar";
 import { SWRConfig } from "swr";
 import { fetcher } from "../helpers/swr";
@@ -27,7 +27,7 @@ const Geist = ({ Component, pageProps, router }): JSX.Element => {
   return (
     <HMSRoomProvider>
       <HMSThemeProvider config={{}} appBuilder={{ theme }}>
-        <GeistProvider themeType={theme}>
+        <GeistProvider themeType={theme} >
           <CssBaseline />
           <Disconnect />
           <motion.div key={router.route}
@@ -60,10 +60,12 @@ const Geist = ({ Component, pageProps, router }): JSX.Element => {
         </GeistProvider>
       </HMSThemeProvider>
     </HMSRoomProvider >
-  )
+  );
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 function MyApp({ Component, pageProps, router }): JSX.Element {
+
 
   return (
     <SWRConfig value={{
@@ -74,7 +76,7 @@ function MyApp({ Component, pageProps, router }): JSX.Element {
     }}>
       <RecoilRoot>
         <ThemeProvider defaultTheme="dark" attribute="class" >
-          <AnimatePresence>
+          <AnimatePresence exitBeforeEnter>
             <Geist Component={Component} pageProps={pageProps} router={router} />
           </AnimatePresence>
         </ThemeProvider >

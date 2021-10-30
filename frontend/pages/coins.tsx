@@ -13,14 +13,11 @@ export default function Post(): JSX.Element {
       <Header />
       <div>
         <div className="container p-4">
-
-
           <Spacer h={7} />
           <h1>Buy HypeCoins here</h1>
-
-          <Footer />
         </div>
       </div>
+      <Footer />
     </div >
   )
 }

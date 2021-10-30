@@ -15,7 +15,7 @@ import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import FilePondPluginFileRename from 'filepond-plugin-file-rename';
 import FilePondPluginImageCrop from 'filepond-plugin-image-crop';
 import FilePondPluginImageTransform from 'filepond-plugin-image-transform';
-import encodeImageToBlurhash from "../../helpers/blurhash";
+import encodeImageToBlurhash from "../../../helpers/blurhash";
 
 // Register the plugins
 registerPlugin(

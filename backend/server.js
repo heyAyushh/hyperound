@@ -1,11 +1,13 @@
 require('dotenv').config()
 // const axios = require('axios')
-const fastify = require('fastify')({ logger: true })
+const fastify = require('fastify')({ logger: { prettyPrint: true, level: 'debug' } })
 // const oauthPlugin = require('fastify-oauth2')
 const grant = require('grant').fastify()
 const mongoose = require('mongoose')
-const Redis = require('ioredis')
 const fastifyCaching = require('fastify-caching')
+const fs = require('fs')
+const path = require('path')
+// const cache = require('./helpers/cache');
 
 const { IS_PROD, IS_TEST, REDIS_URI, SESSION_TTL = 604800 } = process.env
 
@@ -23,9 +25,12 @@ fastify
         secure: process.env.NODE_ENV === 'production',
         maxAge: SESSION_TTL,
         sameSite: 'Lax',
-        domain: process.env.DOMAIN
+        httpOnly: true,
+        path: '/'
+        // domain: process.env.DOMAIN,
+        // options for setCookie, see https://github.com/fastify/fastify-cookie
       },
-      store: new Redis(REDIS_URI)
+      // store: new Redis(REDIS_URI)
     })
   .register(grant({
     defaults: {
@@ -72,16 +77,16 @@ fastify.register(require('fastify-swagger'), {
   exposeRoute: true
 })
 
-fastify.register(require('fastify-multipart'), {
-  // limits: {
-  //   fieldNameSize: 100, // Max field name size in bytes
-  //   fieldSize: 100,     // Max field value size in bytes
-  //   fields: 10,         // Max number of non-file fields
-  //   fileSize: 1000000,  // For multipart forms, the max file size in bytes
-  //   files: 1,           // Max number of file fields
-  //   headerPairs: 2000   // Max number of header key=>value pairs
-  // }
-})
+// fastify.register(require('fastify-multipart'), {
+//   // limits: {
+//   //   fieldNameSize: 100, // Max field name size in bytes
+//   //   fieldSize: 100,     // Max field value size in bytes
+//   //   fields: 10,         // Max number of non-file fields
+//   //   fileSize: 1000000,  // For multipart forms, the max file size in bytes
+//   //   files: 1,           // Max number of file fields
+//   //   headerPairs: 2000   // Max number of header key=>value pairs
+//   // }
+// })
 
 fastify.get('/', async (request, reply) => {
   reply.send('Hyperound API')

@@ -7,21 +7,13 @@ import { loggedInState } from "../store/loggedIn";
 import Link from 'next/link';
 import { userState } from "../store/user";
 import { getAvatarUrl } from "../helpers/avatar";
+import { useMemo } from "react";
 
 export default function LoggedIn(): JSX.Element {
   const [isLoggedIn, setIsLoggedIn] = useRecoilState(loggedInState);
   const [user, _setUser] = useRecoilState(userState);
 
-  function makeid(length) {
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    for (let i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() *
-        charactersLength));
-    }
-    return result;
-  }
+  const avatarUrl = useMemo(() => getAvatarUrl(user.username), [user.username])
 
   return (
     <>
@@ -30,7 +22,7 @@ export default function LoggedIn(): JSX.Element {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >
-          {isLoggedIn ? <Avatar src={getAvatarUrl(user.username)} scale={4} /> : ''}
+          {isLoggedIn ? <Avatar src={avatarUrl} scale={3} /> : ''}
         </motion.div>
       </Link>
     </>

@@ -54,7 +54,7 @@ module.exports = function (fastify, opts, done) {
     }
   }, async (request, reply) => {
     try {
-      const twitterResponse = request.body
+      const twitterResponse = request.session.grant.response
       const userQuery = await User.findOne(
         { 'twitter.id': twitterResponse.raw.user_id },
         { __v: 0, updatedAt: 0 })
@@ -70,15 +70,15 @@ module.exports = function (fastify, opts, done) {
             }
           })
           const userObj = await newUser.save()
-          request.session.user_id = userObj._id
+          request.session.user_id = userObj._id.toString();
           const responseObj = { state: Buffer.from(JSON.stringify(userObj)).toString('base64'), twitter_auth: true }
-          return responseObj
+          reply.send(responseObj)
         } else {
           // check if user_id exists
           const idQuery = await User.findById(request.session.user_id)
           if (!idQuery) {
-            request.session.user_id = undefined // who is this?!
-            return
+            request.session.delete()   // who is this?!
+            reply.code(404).send({ error: 'User not found' })
           }
           // user exists, connect account with twitter
           const updatedUser = await User.findByIdAndUpdate(request.session.user_id,
@@ -86,13 +86,13 @@ module.exports = function (fastify, opts, done) {
           )
           request.session.touch()
           const responseObj = { state: Buffer.from(JSON.stringify(updatedUser)).toString('base64'), twitter_auth: true }
-          return responseObj
+          reply.send(responseObj)
         }
       } else {
         // twitter id exists, log in
-        request.session.user_id = userQuery._id
+        request.session.user_id = userQuery._id.toString()
         const responseObj = { state: Buffer.from(JSON.stringify(userQuery)).toString('base64'), twitter_auth: true }
-        return responseObj
+        reply.send(responseObj)
       }
     } catch (err) {
       fastify.log.error('❎ error:' + err)
@@ -124,10 +124,10 @@ module.exports = function (fastify, opts, done) {
     }
   }, async (request, reply) => {
     try {
-      if (!/^([A-Za-z0-9]{44})$/.test(request.query.address)) {
-        reply.code(400).send({ error: 'Invalid address sent' })
-        return
-      }
+      // if (!/^([A-Za-z0-9]{44})$/.test(request.query.address)) {
+      //   reply.code(400).send({ error: 'Invalid address sent' })
+      //   return
+      // }
       const newChallenge = `Hey,\n please sign this message ${await nanoid(8)} &\n verify your connection to Hyperound!`
       const oldChallenge = await Challenge.findOne({ address: request.query.address })
       if (!oldChallenge) {
@@ -228,13 +228,13 @@ module.exports = function (fastify, opts, done) {
             address: request.body.address
           })
           const userObj = await newUser.save()
-          request.session.user_id = userObj._id
+          request.session.user_id = userObj._id.toString()
           reply.send(userObj)
         } else {
           // check if user_id is valid
           const idQuery = await User.findById(request.session.user_id)
           if (!idQuery) {
-            request.session.user_id = undefined // who is this?!
+            request.destroySession(); // who is this?!
             reply.code(403).send()
             return
           }
@@ -247,9 +247,79 @@ module.exports = function (fastify, opts, done) {
         }
       } else {
         // user exists, login with wallet
-        request.session.user_id = userQuery._id
-        reply.send(userQuery)
+        // request.session.user_id = userQuery._id.toString()
+        request.session.user_id = userQuery._id.toString()
+
+        reply.send(
+          userQuery
+          // session: request.session.encryptedSessionId,
+        )
       }
+    } catch (err) {
+      fastify.log.error('❎ error:' + err)
+      if (!reply.sent) {
+        reply.code(400).send()
+      }
+    }
+  })
+
+  fastify.post('/logout', {
+    schema: {
+      description: 'delete server side session and logout!',
+      response: {
+        200: {
+          description: 'Successful response',
+          type: 'object',
+          properties: {
+            _id: { type: 'string' },
+            username: { type: 'string' },
+            address: { type: 'string' },
+            twitter: {
+              type: 'object',
+              properties: {
+                id: { type: 'string' },
+                screen_name: { type: 'string' },
+                verified: { type: 'string' }
+              }
+            },
+            socials: {
+              type: 'object',
+              properties: {
+                twitter: { type: 'string' },
+                instagram: { type: 'string' },
+                facebook: { type: 'string' },
+                website: { type: 'string' }
+              }
+            },
+            followers: {
+              type: 'object',
+              properties: {
+                count: { type: 'number' },
+                users: { type: 'array' }
+              }
+            },
+            following: {
+              type: 'object',
+              properties: {
+                count: { type: 'number' },
+                users: { type: 'array' }
+              }
+            }
+          }
+        }
+      }
+    }
+  }, async (request, reply) => {
+    try {
+      const session = request.session;
+      request.sessionStore.destroy(session.sessionId, (err) => {
+        if (err) {
+          fastify.log.error('❎ error:' + err)
+          reply.code(400).send()
+        } else {
+          reply.send();
+        }
+      })
     } catch (err) {
       fastify.log.error('❎ error:' + err)
       if (!reply.sent) {

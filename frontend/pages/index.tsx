@@ -17,14 +17,17 @@ export default function Home(): JSX.Element {
 
           {loggedIn ? (<>
             <Text h1>Feed</Text>
+            <Link href="/sol" passHref>
+              <Text className="m-5 text-2xl md:text-9xl font-extrabold text-black hover:text-transparent dark:hover:text-transparent bg-clip-text from-yellow-200 via-red-500 hover:cursor-text bg-gradient-conic-l to-fuchsia-500"> SOL </Text>
+            </Link>
           </>) : (<>
             <Spacer h={7} />
-            <h1 className="font-extrabold md:text-9xl m-5 text-2xl"> Namaste 🙏</h1>
+            <h1 className="m-5 text-2xl md:text-9xl font-extrabold"> Namaste 🙏</h1>
             <Link href="/explore" passHref>
-              <Text className="font-extrabold md:text-9xl m-5 text-2xl hover:cursor-text dark:hover:text-transparent hover:text-transparent text-black bg-clip-text bg-gradient-conic-l from-yellow-200 via-red-500 to-fuchsia-500"> Explore </Text>
+              <Text className="m-5 text-2xl md:text-9xl font-extrabold text-black hover:text-transparent dark:hover:text-transparent bg-clip-text from-yellow-200 via-red-500 hover:cursor-text bg-gradient-conic-l to-fuchsia-500"> Explore </Text>
             </Link>
             <Link href="/about-us" passHref>
-              <Text className="font-extrabold md:text-9xl m-5 text-2xl hover:cursor-text dark:hover:text-transparent hover:text-transparent text-black bg-clip-text bg-gradient-to-bl from-green-200 via-green-300 to-blue-500"> About Us </Text>
+              <Text className="m-5 text-2xl md:text-9xl font-extrabold text-black hover:text-transparent dark:hover:text-transparent bg-clip-text bg-gradient-to-bl from-green-200 via-green-300 to-blue-500 hover:cursor-text"> About Us </Text>
             </Link>
           </>)
           }

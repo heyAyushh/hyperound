@@ -1,7 +1,8 @@
 import {
     useHMSStore,
     selectLocalPeer,
-    selectPeers
+    selectPeers, 
+    HMSPeer
 } from "@100mslive/hms-video-react"
 import { Grid } from "@geist-ui/react";
 import { HostVideo } from "./HostVideo";
@@ -10,7 +11,7 @@ import { VideoTile } from "./VideoTile";
 export default function Room({room_id}) {
 
     const localPeer = useHMSStore(selectLocalPeer);
-    const peers = useHMSStore(selectPeers);
+    const peers = useHMSStore(selectPeers) as HMSPeer[];
 
     const types = ['secondary', 'success', 'warning', 'error', 'dark', 'alert', 'purple', 'violet', 'cyan']
 

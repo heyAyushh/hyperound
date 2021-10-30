@@ -1,9 +1,12 @@
 import * as React from 'react';
-import { KBarResults, KBarSearch, KBarProvider, KBarPortal, KBarPositioner, KBarAnimator, Action, ResultHandlers, ResultState } from 'kbar';
+import { KBarResults, KBarSearch, KBarProvider, KBarPortal, KBarPositioner, KBarAnimator, Action } from 'kbar';
+import useMatches, { NO_GROUP } from "kbar/lib/useMatches";
 import { useRouter } from "next/router";
 import { useTheme } from "next-themes";
 import { useMediaQuery } from "@geist-ui/react";
 import { Home, Aperture, Briefcase, Film } from "@geist-ui/react-icons";
+import { useRecoilValue } from "recoil";
+import { userState } from "../../store/user";
 
 const searchStyle = {
   padding: "12px 16px",
@@ -16,14 +19,20 @@ const searchStyle = {
   color: "var(--foreground)",
 };
 
-const resultsStyle = {
-  maxHeight: 400,
-  overflow: "auto",
+const groupNameStyle = {
+  padding: "8px 16px",
+  fontSize: "10px",
+  textTransform: "uppercase" as const,
+  opacity: 0.5,
+  background: "var(--background)",
 };
 
 const App = ({ Component, pageProps }): JSX.Element => {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+
+  const { username, isCreator } = useRecoilValue(userState)
+
   const isMobile = useMediaQuery('mobile');
 
   const animatorStyle = {
@@ -32,7 +41,7 @@ const App = ({ Component, pageProps }): JSX.Element => {
     marginRight: isMobile ? '32px' : '0px',
     background: theme === 'light' ? 'white' : 'black',
     borderRadius: "8px",
-    boxShadow: theme === 'light' ? '0 30px 60px rgba(0, 0, 0, 0.12)' : '0 16px 32px rgba(0,0,0,0.07)',
+    boxShadow: theme === 'light' ? '0 30px 60px rgba(0, 0, 0, 0.12)' : '0px -1px 143px 31px rgba(250,240,240,0.2)',
   };
 
   return (
@@ -54,7 +63,7 @@ const App = ({ Component, pageProps }): JSX.Element => {
             keywords: 'back',
             section: 'Navigation',
             perform: () => router.push('/'),
-            icon: <Home className="text-dark-accent-2 m-2" size={20} />,
+            icon: <Home className="m-2 text-dark-accent-2" size={20} />,
             subtitle: "Browse the awesome feed!"
           },
           {
@@ -64,7 +73,7 @@ const App = ({ Component, pageProps }): JSX.Element => {
             keywords: 'help',
             section: 'Navigation',
             perform: () => router.push('/explore'),
-            icon: <Film className="text-dark-accent-2 m-2" size={20} />,
+            icon: <Film className="m-2 text-dark-accent-2" size={20} />,
             subtitle: "",
           },
           {
@@ -73,8 +82,8 @@ const App = ({ Component, pageProps }): JSX.Element => {
             shortcut: ['c'],
             keywords: 'email hello',
             section: 'Navigation',
-            perform: () => router.push('/creators'),
-            icon: <Briefcase className="text-dark-accent-2 m-2" size={20} />,
+            perform: () => isCreator && username ? router.push(`${username}/creator`) : router.push('/creators'),
+            icon: <Briefcase className="m-2 text-dark-accent-2" size={20} />,
             subtitle: "",
           },
           {
@@ -85,7 +94,7 @@ const App = ({ Component, pageProps }): JSX.Element => {
             section: 'Navigation',
             // perform: () => window.open('https://twitter.com/timcchang', '_blank'),
             perform: () => router.push('/coins'),
-            icon: <Aperture className="text-dark-accent-2 m-2" size={20} />,
+            icon: <Aperture className="m-2 text-dark-accent-2" size={20} />,
             subtitle: "Buy, Sell, Check Balance",
           },
           {
@@ -149,12 +158,7 @@ const App = ({ Component, pageProps }): JSX.Element => {
               style={searchStyle}
               placeholder="Type a command or search…"
             />
-            <KBarResults
-              style={resultsStyle}
-              onRender={(action, handlers, state) => (
-                <Render action={action} handlers={handlers} state={state} />
-              )}
-            />
+            <RenderResults />
           </KBarAnimator>
         </KBarPositioner>
       </KBarPortal>
@@ -166,92 +170,86 @@ const App = ({ Component, pageProps }): JSX.Element => {
   );
 };
 
-function Render({
-  action,
-  handlers,
-  state,
-}: {
-  action: Action;
-  handlers: ResultHandlers;
-  state: ResultState;
-}) {
-  const ownRef = React.useRef<HTMLDivElement>(null);
-  const { theme } = useTheme();
-
-  const active = state.index === state.activeIndex;
-
-  React.useEffect(() => {
-    if (active) {
-      // wait for the KBarAnimator to resize, _then_ scrollIntoView.
-      // https://medium.com/@owencm/one-weird-trick-to-performant-touch-response-animations-with-react-9fe4a0838116
-      window.requestAnimationFrame(() =>
-        window.requestAnimationFrame(() => {
-          const element = ownRef.current;
-          if (!element) {
-            return;
-          }
-          element.scrollIntoView({
-            block: "nearest",
-            behavior: "smooth",
-            inline: "start",
-          });
-        })
-      );
-    }
-  }, [active]);
+function RenderResults() {
+  const groups = useMatches();
+  const flattened = React.useMemo(
+    () =>
+      groups.reduce((acc, curr) => {
+        acc.push(curr.name);
+        acc.push(...curr.actions);
+        return acc;
+      }, []),
+    [groups]
+  );
 
   return (
-    <div
-      ref={ownRef}
-      {...handlers}
-      style={{
-        padding: "12px 16px",
-        background: active && theme === 'light' ? '#EAEAEA' : active && theme === 'dark' ? '#2F2F2F' : 'transparent',
-        borderLeft: `4px solid ${active && theme === 'light' ? 'black' : active && theme === 'dark' ? 'white' : 'transparent'}`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        cursor: "pointer",
-      }}
-    >
-      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-        {action.icon && action.icon}
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <span>{action.name}</span>
-          {action.subtitle && (
-            <span style={{ fontSize: 12 }}>{action.subtitle}</span>
-          )}
+    <KBarResults
+      items={flattened.filter((i) => i !== NO_GROUP)}
+      onRender={({ item, active }) =>
+        typeof item === "string" ? (
+          <div style={groupNameStyle}>{item}</div>
+        ) : (
+          <ResultItem action={item} active={active} />
+        )
+      }
+    />
+  );
+}
+
+// eslint-disable-next-line react/display-name
+const ResultItem = React.forwardRef(
+  (
+    {
+      action,
+      active,
+    }: {
+      action: Action;
+      active: boolean;
+    },
+    ref: React.Ref<HTMLDivElement>
+  ) => {
+    return (
+      <div
+        ref={ref}
+        style={{
+          padding: "12px 16px",
+          background: active ? "var(--a1)" : "var(--background)",
+          borderLeft: `2px solid ${active ? "var(--foreground)" : "transparent"
+            }`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          cursor: "pointer",
+        }}
+      >
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          {action.icon && action.icon}
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <span>{action.name}</span>
+            {action.subtitle && (
+              <span style={{ fontSize: 12 }}>{action.subtitle}</span>
+            )}
+          </div>
         </div>
+        {action.shortcut?.length ? (
+          <div style={{ display: "grid", gridAutoFlow: "column", gap: "4px" }}>
+            {action.shortcut.map((sc) => (
+              <kbd
+                key={sc}
+                style={{
+                  padding: "4px 6px",
+                  background: "rgba(0 0 0 / .1)",
+                  borderRadius: "4px",
+                }}
+              >
+                {sc}
+              </kbd>
+            ))}
+          </div>
+        ) : null}
       </div>
-      {action.shortcut?.length ? (
-        <div style={{ display: "grid", gridAutoFlow: "column", gap: "4px" }}>
-          {action.shortcut.map((sc) => (
-            <kbd
-              key={sc}
-              style={{
-                padding: "4px 6px",
-                background: "rgba(0 0 0 / .1)",
-                borderRadius: "4px",
-              }}
-            >
-              {sc}
-            </kbd>
-          ))}
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-function HomeIcon() {
-  return (
-    <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path
-        d="m19.681 10.406-7.09-6.179a.924.924 0 0 0-1.214.002l-7.06 6.179c-.642.561-.244 1.618.608 1.618.51 0 .924.414.924.924v5.395c0 .51.414.923.923.923h3.236V14.54c0-.289.234-.522.522-.522h2.94c.288 0 .522.233.522.522v4.728h3.073c.51 0 .924-.413.924-.923V12.95c0-.51.413-.924.923-.924h.163c.853 0 1.25-1.059.606-1.62Z"
-        fill="var(--foreground)"
-      />
-    </svg>
-  );
-}
+    );
+  }
+);
 
 export default App;

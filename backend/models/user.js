@@ -25,6 +25,14 @@ const userSchema = new mongoose.Schema({
   token: {
     type: String
   },
+  isCreator: {
+    type: Boolean,
+    default: false
+  },
+  invitedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
   twitter: {
     id: String,
     screen_name: String,

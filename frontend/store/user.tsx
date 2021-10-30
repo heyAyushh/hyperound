@@ -1,10 +1,16 @@
-import { atom } from "recoil";
+import { atom, AtomOptions } from "recoil";
+
+type User = {
+  username: string,
+  isCreator: boolean,
+  userId: string,
+}
 
 export const userState = atom({
   key: 'userState',
   default: {
-    username: null,
-    isCreator: null,
-    userId: null,
+    username: '',
+    isCreator: false,
+    userId: '',
   },
-});
+} as AtomOptions<User>);

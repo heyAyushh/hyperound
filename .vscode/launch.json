@@ -5,11 +5,13 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "pwa-msedge",
-      "request": "launch",
-      "name": "Launch Edge against localhost",
-      "url": "http://localhost:3000",
-      "webRoot": "${workspaceFolder}"
+      "name": "Attach by Process ID",
+      "processId": "${command:PickProcess}",
+      "request": "attach",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "type": "pwa-node"
     }
   ]
 }

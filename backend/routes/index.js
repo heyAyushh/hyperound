@@ -3,5 +3,6 @@ module.exports = async (fastify, opts, done) => {
 	fastify.register(require('./post'))
 	fastify.register(require('./feed'))
 	fastify.register(require('./profile'))
+	fastify.register(require('./invite'))
 	done()
 }
