@@ -3,12 +3,12 @@ const withTM = require('next-transpile-modules')([
   '@project-serum/sol-wallet-adapter',
   '@solana/wallet-adapter-react',
   '@solana/wallet-adapter-base',
-  '@solana/wallet-adapter-wallets',
-  '@solana/wallet-adapter-bitpie',
+  // '@solana/wallet-adapter-wallets',
+  // '@solana/wallet-adapter-bitpie',
   'react-animated-menu',
 ]);
 
-const withImages = require('next-images');
+// const withImages = require('next-images');
 
 // module.exports = withTM(withImages({
 //   reactStrictMode: true,
@@ -25,10 +25,10 @@ const withImages = require('next-images');
 
 module.exports = withTM({
   swcMinify: true,
-  reactStrictMode: true,
-  experimental: {
-    concurrentFeatures: true,
-  },
+  // reactStrictMode: true,
+  // experimental: {
+  //   concurrentFeatures: true,
+  // },
   images: {
     formats: ['image/avif', 'image/webp']
   },
