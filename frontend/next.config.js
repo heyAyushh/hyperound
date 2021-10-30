@@ -25,10 +25,10 @@ const withTM = require('next-transpile-modules')([
 
 module.exports = withTM({
   swcMinify: true,
-  reactStrictMode: true,
-  experimental: {
-    concurrentFeatures: true,
-  },
+  // reactStrictMode: true,
+  // experimental: {
+  //   concurrentFeatures: true,
+  // },
   images: {
     formats: ['image/avif', 'image/webp']
   },
@@ -39,8 +39,6 @@ module.exports = withTM({
     if (!isServer) {
       config.resolve.fallback.fs = false;
     }
-
-    config.externals = config.externals || [];
 
     return config
   }

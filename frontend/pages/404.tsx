@@ -1,5 +1,4 @@
 import Header from '../components/Header';
-import { Page } from "@geist-ui/react";
 import Footer from "../components/Footer";
 
 export default function Home(): JSX.Element {
@@ -8,7 +7,7 @@ export default function Home(): JSX.Element {
       <Header />
       <div>
         <div className="container p-4">
-          <h1 className="font-extrabold text-9xl m-5"> कहाँ  ? </h1>
+          <h1 className="m-5 text-9xl font-extrabold"> कहाँ  ? </h1>
         </div>
       </div>
       <Footer />
