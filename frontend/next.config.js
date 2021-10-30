@@ -5,7 +5,7 @@ const withTM = require('next-transpile-modules')([
   '@solana/wallet-adapter-base',
   '@solana/wallet-adapter-wallets',
   '@solana/wallet-adapter-bitpie',
-  'react-animated-menu'
+  'react-animated-menu',
 ]);
 
 const withImages = require('next-images');
