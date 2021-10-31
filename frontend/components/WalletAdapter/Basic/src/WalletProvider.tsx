@@ -61,7 +61,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
     const [loggedIn, setLoggedin] = useRecoilState(loggedInState);
     const [loggedInWallet, setloggedInWallet] = useRecoilState(loggedInWalletState);
     const [user, setUser] = useRecoilState(userState);
-    const [provider, loggedInAlready] = getProvider();
+    const provider = getProvider();
 
     const walletsByName = useMemo(
       () =>
@@ -126,7 +126,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
 
         console.log('session', backend_res_raw);
 
-        setUser(user)
+        // setUser(user)
         setLoggedin(true);
         setloggedInWallet({
           publicKey: provider.publicKey?.toBase58(),
@@ -165,7 +165,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
         select(null);
       }
 
-    }, [adapter, select, setConnected, setAutoApprove, setPublicKey, setToast, signLoginString, loggedInWallet]);
+    }, [adapter, select, setConnected, setAutoApprove, setPublicKey, setToast, loggedInWallet]);
 
     const onDisconnect = useCallback(() => reset(), [reset]);
 
@@ -227,15 +227,15 @@ export const WalletProvider: FC<WalletProviderProps> = ({
           publicKey: null,
           provider: null
         });
-        setUser({
-          username: null,
-          userId: null,
-          isCreator: null,
-        });
+        // setUser({
+        //   username: null,
+        //   userId: null,
+        //   isCreator: null,
+        // });
 
         await select(null);
       }
-    }, [disconnecting, adapter, select, setDisconnecting, setToast, setLoggedin, setloggedInWallet, logoutBackend, setUser]);
+    }, [disconnecting, adapter, select, setDisconnecting, setToast, setLoggedin, setloggedInWallet, logoutBackend]);
 
     const signTransaction = useCallback(
       async (transaction: Transaction) => {

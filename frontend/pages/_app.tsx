@@ -21,7 +21,7 @@ const Geist = ({ Component, pageProps, router }): JSX.Element => {
   const ISSERVER = typeof window === 'undefined';
 
   if (ISSERVER) {
-    return <></>
+    return <div></div>
   }
 
   return (

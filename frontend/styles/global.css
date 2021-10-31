@@ -55,7 +55,7 @@ kbd {
 }
 
 .GiestButton-blurred {
-  filter: blur(16px)
+  filter: blur(16px);
 }
 
 .GiestButton {
@@ -67,7 +67,7 @@ kbd {
   @apply min-h-screen m-8 overflow-hidden relative;
 }
 
-.tabs{
+.tabs {
   display: flex;
   align-items: center;
   justify-content: center;
