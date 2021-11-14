@@ -1,12 +1,13 @@
 import * as React from 'react';
-import { KBarResults, KBarSearch, KBarProvider, KBarPortal, KBarPositioner, KBarAnimator, Action } from 'kbar';
-import useMatches, { NO_GROUP } from "kbar/lib/useMatches";
+import { KBarResults, KBarSearch, KBarProvider, KBarPortal, KBarPositioner, KBarAnimator, Action, ActionId, useDeepMatches } from 'kbar';
 import { useRouter } from "next/router";
 import { useTheme } from "next-themes";
 import { useMediaQuery } from "@geist-ui/react";
 import { Home, Aperture, Briefcase, Film } from "@geist-ui/react-icons";
 import { useRecoilValue } from "recoil";
 import { userState } from "../../store/user";
+import useUser from "../../lib/useUser";
+import { ActionImpl } from "kbar/lib/action";
 
 const searchStyle = {
   padding: "12px 16px",
@@ -31,7 +32,7 @@ const App = ({ Component, pageProps }): JSX.Element => {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
 
-  const { username, isCreator } = useRecoilValue(userState)
+  // const { user: { username, isCreator } } = useUser({})
 
   const isMobile = useMediaQuery('mobile');
 
@@ -54,7 +55,6 @@ const App = ({ Component, pageProps }): JSX.Element => {
             shortcut: [],
             keywords: 'find',
             section: '',
-            children: ['docs1', 'docs2'],
           },
           {
             id: 'homeAction',
@@ -82,7 +82,7 @@ const App = ({ Component, pageProps }): JSX.Element => {
             shortcut: ['c'],
             keywords: 'email hello',
             section: 'Navigation',
-            perform: () => isCreator && username ? router.push(`${username}/creator`) : router.push('/creators'),
+            perform: () => router.push('/creators'),
             icon: <Briefcase className="m-2 text-dark-accent-2" size={20} />,
             subtitle: "",
           },
@@ -120,8 +120,7 @@ const App = ({ Component, pageProps }): JSX.Element => {
             name: 'Change theme…',
             shortcut: [],
             keywords: 'interface color dark light',
-            section: '',
-            children: ['darkTheme', 'lightTheme'],
+            section: 'Preferences',
           },
           {
             id: 'darkTheme',
@@ -171,25 +170,20 @@ const App = ({ Component, pageProps }): JSX.Element => {
 };
 
 function RenderResults() {
-  const groups = useMatches();
-  const flattened = React.useMemo(
-    () =>
-      groups.reduce((acc, curr) => {
-        acc.push(curr.name);
-        acc.push(...curr.actions);
-        return acc;
-      }, []),
-    [groups]
-  );
+  const { results, rootActionId } = useDeepMatches();
 
   return (
     <KBarResults
-      items={flattened.filter((i) => i !== NO_GROUP)}
+      items={results}
       onRender={({ item, active }) =>
         typeof item === "string" ? (
           <div style={groupNameStyle}>{item}</div>
         ) : (
-          <ResultItem action={item} active={active} />
+          <ResultItem
+            action={item}
+            active={active}
+            currentRootActionId={rootActionId}
+          />
         )
       }
     />
@@ -202,37 +196,87 @@ const ResultItem = React.forwardRef(
     {
       action,
       active,
+      currentRootActionId,
     }: {
-      action: Action;
+      action: ActionImpl;
       active: boolean;
+      currentRootActionId: ActionId;
     },
     ref: React.Ref<HTMLDivElement>
   ) => {
+    const { theme, setTheme } = useTheme();
+    const isLight = theme === 'light';
+
+    const ancestors = React.useMemo(() => {
+      return (function collect(action: ActionImpl, ancestors = []) {
+        if (action.parent && action.parent.id !== currentRootActionId) {
+          ancestors.push(action.parent);
+          if (action.parent.parent) {
+            collect(action.parent.parent, ancestors);
+          }
+        }
+        return ancestors;
+      })(action);
+    }, [action, currentRootActionId]);
+
     return (
       <div
         ref={ref}
         style={{
           padding: "12px 16px",
-          background: active ? "var(--a1)" : "var(--background)",
-          borderLeft: `2px solid ${active ? "var(--foreground)" : "transparent"
-            }`,
+          background: active ? isLight? "#EAEAEA" : '#2F2F2F' : "transparent",
+          borderLeft: `2px solid ${
+            active ? isLight? "black" : 'white' : "transparent"
+          }`,
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           cursor: "pointer",
         }}
       >
-        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: "8px",
+            alignItems: "center",
+            fontSize: 14,
+          }}
+        >
           {action.icon && action.icon}
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <span>{action.name}</span>
+            <div>
+              {ancestors.length > 0 &&
+                ancestors.map((ancestor) => (
+                  <React.Fragment key={ancestor.id}>
+                    <span
+                      style={{
+                        opacity: 0.5,
+                        marginRight: 8,
+                      }}
+                    >
+                      {ancestor.name}
+                    </span>
+                    <span
+                      style={{
+                        marginRight: 8,
+                      }}
+                    >
+                      &rsaquo;
+                    </span>
+                  </React.Fragment>
+                ))}
+              <span>{action.name}</span>
+            </div>
             {action.subtitle && (
               <span style={{ fontSize: 12 }}>{action.subtitle}</span>
             )}
           </div>
         </div>
         {action.shortcut?.length ? (
-          <div style={{ display: "grid", gridAutoFlow: "column", gap: "4px" }}>
+          <div
+            aria-hidden
+            style={{ display: "grid", gridAutoFlow: "column", gap: "4px" }}
+          >
             {action.shortcut.map((sc) => (
               <kbd
                 key={sc}
@@ -240,6 +284,7 @@ const ResultItem = React.forwardRef(
                   padding: "4px 6px",
                   background: "rgba(0 0 0 / .1)",
                   borderRadius: "4px",
+                  // fontSize: 14,
                 }}
               >
                 {sc}

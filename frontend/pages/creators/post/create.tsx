@@ -95,7 +95,7 @@ export default function CreatePost(): JSX.Element {
             }}
 
             onprocessfile={async (err, file) => {
-              console.log('hello')
+              // console.log('hello')
             }}
             chunkUploads={true}
             acceptedFileTypes={['image/jpg']}

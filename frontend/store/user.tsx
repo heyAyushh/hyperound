@@ -1,9 +1,11 @@
 import { atom, AtomOptions } from "recoil";
+import useUser from "../lib/useUser";
 
 type User = {
   username: string,
-  isCreator: boolean,
-  userId: string,
+  isCreator?: boolean,
+  isLoggedin?: boolean
+  // userId: string,
 }
 
 export const userState = atom({
@@ -12,5 +14,7 @@ export const userState = atom({
     username: '',
     isCreator: false,
     userId: '',
+    isLoggedin: false
   },
 } as AtomOptions<User>);
+

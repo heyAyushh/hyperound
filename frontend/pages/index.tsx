@@ -4,18 +4,39 @@ import Link from "next/link";
 import { useRecoilValueLoadable } from "recoil";
 import { loggedInState } from "../store/loggedIn";
 import Footer from "../components/Footer";
+import useUser from "../lib/useUser";
+import { withSessionSsr } from "../lib/withSession";
 
-export default function Home(): JSX.Element {
-  const { contents: loggedIn } = useRecoilValueLoadable(loggedInState)
+export const getServerSideProps = withSessionSsr(
+  async function getServerSideProps({ req }) {
+    const user = req.session.user;
+
+    if(!user) {
+      return {
+        props: {
+          user: null, 
+          isLoggedin: !!user,
+        }
+      }
+    }
+
+    return {
+      props: {
+        user,
+        isLoggedin: !!user,
+      },
+    };
+  },
+);
+
+export default function Home({ user, isLoggedin }): JSX.Element {
 
   return (
     <div className="page">
       <Header />
       <div>
         <div className="">
-
-
-          {loggedIn ? (<>
+          {isLoggedin ? (<>
             <Text h1>Feed</Text>
             <Link href="/sol" passHref>
               <Text className="m-5 text-2xl md:text-9xl font-extrabold text-black hover:text-transparent dark:hover:text-transparent bg-clip-text from-yellow-200 via-red-500 hover:cursor-text bg-gradient-conic-l to-fuchsia-500"> SOL </Text>
