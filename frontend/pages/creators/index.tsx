@@ -6,10 +6,34 @@ import { useRecoilValue } from "recoil";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import { userState } from "../../store/user";
+import { withSessionSsr } from "../../lib/withSession";
 
 // choose tools
 // create tokens (price based on tools)
 // POST CONTENT !! GO LIVE !!
+
+export const getServerSideProps = withSessionSsr(
+  async function getServerSideProps({ req }) {
+    const user = req.session.user;
+
+    console.log(user)
+
+    if (user?.isCreator !== true) {
+      return {
+        redirect: {
+          destination: '/creators/join',
+          permanent: true,
+        },
+      }
+    }
+
+    return {
+      props: {
+        user,
+      },
+    };
+  },
+);
 
 // export async function getServerSideProps(context: GetServerSidePropsContext): Promise<any> {
 //   const backend = process.env.NEXT_PUBLIC_BACKEND;
@@ -50,22 +74,6 @@ import { userState } from "../../store/user";
 export default function Post({ profile }): JSX.Element {
   const router = useRouter();
   const backend = process.env.NEXT_PUBLIC_BACKEND;
-
-  useEffect(() => {
-    const res = fetch(`${backend}/profile`, {
-      method: 'GET'
-    }).then(res => res.json())
-      .then(data => {
-        console.log(data)
-        if (data.statusCode === 403) {
-          router.push('/creators/join');
-        }
-      })
-      .catch(err => {
-        console.log(err)
-      });
-  })
-
 
   // console.log(profile.isCreator);
 

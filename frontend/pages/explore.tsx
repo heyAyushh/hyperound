@@ -2,7 +2,7 @@ import Header from '../components/Header';
 import { Page, Text, useMediaQuery, useToasts } from "@geist-ui/react";
 import React, { useState } from "react";
 import useSWR, { SWRConfig } from 'swr';
-import { fetcher } from "../helpers/fetcher";
+import { fetcher } from "../helpers/swr";
 import axios from "axios";
 import Footer from "../components/Footer";
 

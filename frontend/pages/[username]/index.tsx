@@ -8,8 +8,7 @@ import { loggedInState, loggedInWalletState } from "../../store/loggedIn";
 import { tokenState } from "../../store/token";
 import Link from 'next/link';
 import { Divider } from "@geist-ui/react";
-import { useKBar } from "kbar";
-import { VisualState } from "../../types/types";
+import { useKBar, VisualState } from "kbar";
 import Footer from "../../components/Footer";
 import { GetServerSidePropsContext } from "next";
 import { userState } from "../../store/user";
@@ -19,6 +18,8 @@ import { getAvatarUrl } from "../../helpers/avatar";
 import { useTheme } from "next-themes";
 import createTokenButton from "../../helpers/solanaProgram";
 import { motion } from 'framer-motion';
+import axios from "axios";
+import useUser from "../../lib/useUser";
 
 export async function getServerSideProps(context: GetServerSidePropsContext): Promise<any> {
   const { username } = context.params;
@@ -27,8 +28,10 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
   let data;
 
   try {
-    const res = await fetch(`${backend}/profile/name/${username}`);
-    data = await res.json();
+    const res = await axios.get(`${backend}/profile/name/${username}`, {
+      withCredentials: true,
+    });
+    data = res.data;
   } catch (err) {
     return {
       redirect: {
@@ -64,7 +67,8 @@ export default function Post({ profile }): JSX.Element {
 
   const [creatingToken, setCreatingToken] = useState(false);
   const [loggedIn, setTwitter] = useRecoilState(loggedInState);
-  const [currentUser] = useRecoilState(userState);
+  // const [currentUser] = useRecoilState(userState);
+  const { user: currentUser, isLogggedin } = useUser();
   const [walletConnect, setWalletConnected] = useRecoilState(loggedInWalletState);
   const [token, setToken] = useRecoilState(tokenState);
   const [_, setToast] = useToasts();
@@ -75,8 +79,8 @@ export default function Post({ profile }): JSX.Element {
   const posts = useSWR(`${process.env.NEXT_PUBLIC_BACKEND}/posts/user/${username}`, fetcher);
 
   const isMobile = useMediaQuery('xs');
-  const isOwner = username === currentUser.username;
-  const isCreator = currentUser.isCreator;
+  const isOwner = username === currentUser?.username;
+  const isCreator = currentUser?.isCreator;
 
   function SectionOne(): JSX.Element {
 

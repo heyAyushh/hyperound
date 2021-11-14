@@ -56,7 +56,7 @@ module.exports = function (fastify, opts, done) {
     }
   }, async (request, reply) => {
     try {
-      const userQuery = await User.findById(request.session.user_id,
+      const userQuery = await User.findById(request.user.user_id,
         { __v: 0, 'followers.users': 0, 'following.users': 0 })
         .lean()
       if (!userQuery) {
@@ -96,7 +96,7 @@ module.exports = function (fastify, opts, done) {
     }
   }, async (request, reply) => {
     try {
-      if (request.body.userId !== String(request.session.user_id)) {
+      if (request.body.userId !== String(request.user.user_id)) {
         reply.code(403).send()
         return
       }
@@ -289,17 +289,17 @@ module.exports = function (fastify, opts, done) {
   }, async (request, reply) => {
     try {
       const userQuery = await User.findById(request.params.userId, { followers: 1 }).lean()
-      console.log(userQuery, !userQuery.followers.users.includes(String(request.session.user_id)))
+      console.log(userQuery, !userQuery.followers.users.includes(String(request.user.user_id)))
       if (!userQuery) {
         reply.code(404).send()
         return
       } else {
-        if (!userQuery.followers.users.includes(String(request.session.user_id))) {
+        if (!userQuery.followers.users.includes(String(request.user.user_id))) {
           await User.findByIdAndUpdate(request.params.userId, {
             $inc: { 'followers.count': 1 },
-            $push: { 'followers.users': request.session.user_id }
+            $push: { 'followers.users': request.user.user_id }
           })
-          await User.findByIdAndUpdate(request.session.user_id, {
+          await User.findByIdAndUpdate(request.user.user_id, {
             $inc: { 'following.count': 1 },
             $push: { 'following.users': request.params.userId }
           })
@@ -343,12 +343,12 @@ module.exports = function (fastify, opts, done) {
         reply.code(404).send()
         return
       } else {
-        if (userQuery.followers.users.includes(String(request.session.user_id))) {
+        if (userQuery.followers.users.includes(String(request.user.user_id))) {
           await User.findByIdAndUpdate(request.params.userId, {
             $inc: { 'followers.count': -1 },
-            $pull: { 'followers.users': request.session.user_id }
+            $pull: { 'followers.users': request.user.user_id }
           })
-          await User.findByIdAndUpdate(request.session.user_id, {
+          await User.findByIdAndUpdate(request.user.user_id, {
             $inc: { 'following.count': -1 },
             $pull: { 'following.users': request.params.userId }
           })

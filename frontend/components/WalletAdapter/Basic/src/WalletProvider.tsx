@@ -12,6 +12,9 @@ import { getProvider } from "../../../../helpers/SolanaProvider";
 import { loggedInState, loggedInWalletState, walletAutoConnectState } from "../../../../store/loggedIn";
 import { useRecoilState } from "recoil";
 import { userState } from "../../../../store/user";
+import useUser from "../../../../lib/useUser";
+import fetchJson from "../../../../helpers/fetchJson";
+import router from "next/router";
 
 export interface WalletProviderProps {
   children: ReactNode;
@@ -60,7 +63,8 @@ export const WalletProvider: FC<WalletProviderProps> = ({
     const [publicKey, setPublicKey] = useState<PublicKey | null>(null);
     const [loggedIn, setLoggedin] = useRecoilState(loggedInState);
     const [loggedInWallet, setloggedInWallet] = useRecoilState(loggedInWalletState);
-    const [user, setUser] = useRecoilState(userState);
+    const [recoilUser, setUser] = useRecoilState(userState);
+    const { user, mutateUser, isLogggedin, isLoading } = useUser();
     const provider = getProvider();
 
     const walletsByName = useMemo(
@@ -92,6 +96,10 @@ export const WalletProvider: FC<WalletProviderProps> = ({
 
     const onReady = useCallback(() => setReady(true), [setReady]);
 
+    useEffect(() => {
+      setUser(user);
+    }, [])
+
     // wallet login verify for backend
     const signLoginString = async () => {
       if (provider && !loggedIn) {
@@ -114,7 +122,7 @@ export const WalletProvider: FC<WalletProviderProps> = ({
 
         const backend_res_raw = await axios({
           method: "post",
-          url: `${process.env.NEXT_PUBLIC_BACKEND}/login/wallet/done`,
+          url: `/api/login`,
           withCredentials: true,
           data: {
             address: provider ? provider.publicKey?.toBase58() : "",
@@ -122,34 +130,45 @@ export const WalletProvider: FC<WalletProviderProps> = ({
           }
         });
 
-        const user = backend_res_raw.data;
+        const user = backend_res_raw.data.user;
 
-        console.log('session', backend_res_raw);
+        console.log('session', user);
 
-        // setUser(user)
+        setUser(user)
         setLoggedin(true);
         setloggedInWallet({
           publicKey: provider.publicKey?.toBase58(),
           provider: provider?.isPhantom,
           verified: true,
         });
+
+        router.push('/');
       }
     }
 
     const logoutBackend = async () => {
-      if (loggedIn) {
-        return axios({
-          method: "post",
-          url: `${process.env.NEXT_PUBLIC_BACKEND}/logout`,
-        });
-      }
+      mutateUser(
+        await fetchJson("/api/logout", { method: "POST" }),
+        false,
+      );
+      router.push('/')
     }
 
     const onConnect = useCallback(async () => {
       if (!adapter) return;
 
       try {
-        await signLoginString();
+        console.log('connecting', isLogggedin);
+        if (!user) {
+          await signLoginString();
+        }
+        setUser(user)
+        setLoggedin(true);
+        setloggedInWallet({
+          publicKey: provider.publicKey?.toBase58(),
+          provider: provider?.isPhantom,
+          verified: true,
+        });
         setConnected(true);
         setAutoApprove(adapter.autoApprove);
         setPublicKey(adapter.publicKey);
@@ -227,11 +246,10 @@ export const WalletProvider: FC<WalletProviderProps> = ({
           publicKey: null,
           provider: null
         });
-        // setUser({
-        //   username: null,
-        //   userId: null,
-        //   isCreator: null,
-        // });
+        setUser({
+          username: null,
+          isCreator: null,
+        });
 
         await select(null);
       }

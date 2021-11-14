@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
   username: {
     type: String,
     unique: true,
-    default: nanoid
+    default: nanoid()
   },
   bio: {
     type: String,
