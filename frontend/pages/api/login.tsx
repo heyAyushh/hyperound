@@ -1,10 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 
 import axios from "axios";
-import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
-import { withIronSessionApiRoute } from "iron-session/next";
 import { withSessionRoute } from "../../lib/withSession";
-import { sessionOptions } from "../../lib/session";
+import { User } from "./user";
 
 export default withSessionRoute(loginRoute);
 
@@ -25,8 +23,8 @@ async function loginRoute(req, res) {
       username: loginResponse.data.user.username,
       isCreator: loginResponse.data.user.isCreator,
       avatar: loginResponse.data.user.avatar,
-      isLoggedIn: true,
-    };
+      isLoggedin: true,
+    } as User;
 
     req.session.token = loginResponse.data.token;
     await req.session.save();

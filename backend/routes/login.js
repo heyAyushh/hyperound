@@ -232,47 +232,31 @@ module.exports = function (fastify, opts, done) {
       }
       const userQuery = await User.findOne({ address: request.body.address }).lean()
       if (!userQuery) {
-        if (!request.session.get('user_id')) {
-          // if no user with address and no current session with user_id, create a new account
-          const newUser = new User({
-            address: request.body.address
-          })
-          const userObj = await newUser.save()
-          console.log(userObj)
-          request.session.set('user_id', userObj)
-          reply.send(userObj)
-        } else {
-          // check if user_id is valid
-          const idQuery = await User.findById(request.session.get('user_id'))
-          if (!idQuery) {
-            request.destroySession(); // who is this?!
-            reply.code(403).send()
-            return
-          }
-          // user exists, connect wallet to account
-          const updatedUser = await User.findByIdAndUpdate(request.session.get('user_id'),
-            { address: request.body.address }
-          )
-          request.session.touch()
-          reply.send(updatedUser)
-        }
+        // if no user with address, create a new account
+        const newUser = new User({
+          address: request.body.address
+        })
+        const userObj = await newUser.save()
+        const token = fastify.jwt.sign({
+          user_id: userObj._id,
+          isCreator: userObj.isCreator
+        })
+
+        reply.send({
+          user: userQuery,
+          token
+        })
       } else {
         // user exists, login with wallet
-        // request.session.get('user_id')
-
         const token = fastify.jwt.sign({
           user_id: userQuery._id,
           isCreator: userQuery.isCreator
         })
 
-        console.log(userQuery)
-
         reply.send({
           user: userQuery,
           token
-        }
-          // session: request.session.encryptedSessionId,
-        )
+        })
       }
     } catch (err) {
       console.log(err)

@@ -13,7 +13,7 @@ import Footer from "../../components/Footer";
 import { GetServerSidePropsContext } from "next";
 import { userState } from "../../store/user";
 import useSWR from "swr";
-import { fetcher } from "../../helpers/swr";
+import { fetcher, postFetcher } from "../../helpers/swr";
 import { getAvatarUrl } from "../../helpers/avatar";
 import { useTheme } from "next-themes";
 import createTokenButton from "../../helpers/solanaProgram";
@@ -76,7 +76,7 @@ export default function Post({ profile }): JSX.Element {
     visible: state.visualState !== VisualState.hidden
   }));
 
-  const posts = useSWR(`${process.env.NEXT_PUBLIC_BACKEND}/posts/user/${username}`, fetcher);
+  const posts = useSWR(`/api/gateway?method=GET&url=${process.env.NEXT_PUBLIC_BACKEND}/posts/user/${username}`, postFetcher);
 
   const isMobile = useMediaQuery('xs');
   const isOwner = username === currentUser?.username;

@@ -16,9 +16,7 @@ export const getServerSideProps = withSessionSsr(
   async function getServerSideProps({ req }) {
     const user = req.session.user;
 
-    console.log(user)
-
-    if (user?.isCreator !== true) {
+    if (!user?.isCreator) {
       return {
         redirect: {
           destination: '/creators/join',
@@ -35,43 +33,7 @@ export const getServerSideProps = withSessionSsr(
   },
 );
 
-// export async function getServerSideProps(context: GetServerSidePropsContext): Promise<any> {
-//   const backend = process.env.NEXT_PUBLIC_BACKEND;
-
-//   let data;
-
-//   try {
-//     const res = await fetch(`${backend}/profile`, {
-//       method: 'GET'
-//     });
-//     data = await res.json();
-//     console.log(data)
-//   } catch (err) {
-//     return {
-//       redirect: {
-//         destination: '/creators/join',
-//         permanent: true,
-//       },
-//     }
-//   }
-
-//   // or use context.resolvedUrl for conditional redirect
-//   // if(context.resolvedUrl == "/")
-//   if (data.statusCode === 404) {
-//     return {
-//       redirect: {
-//         destination: '/creators',
-//         permanent: true,
-//       },
-//     }
-//   }
-
-//   return {
-//     props: { profile: data, }, // will be passed to the page component as props
-//   }
-// }
-
-export default function Post({ profile }): JSX.Element {
+export default function Post({ user }): JSX.Element {
   const router = useRouter();
   const backend = process.env.NEXT_PUBLIC_BACKEND;
 

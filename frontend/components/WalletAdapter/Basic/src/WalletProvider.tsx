@@ -132,8 +132,6 @@ export const WalletProvider: FC<WalletProviderProps> = ({
 
         const user = backend_res_raw.data.user;
 
-        console.log('session', user);
-
         setUser(user)
         setLoggedin(true);
         setloggedInWallet({
@@ -158,7 +156,6 @@ export const WalletProvider: FC<WalletProviderProps> = ({
       if (!adapter) return;
 
       try {
-        console.log('connecting', isLogggedin);
         if (!user) {
           await signLoginString();
         }
@@ -180,7 +177,6 @@ export const WalletProvider: FC<WalletProviderProps> = ({
           })
         }
       } catch (err) {
-        console.log('wallet onconnect 141');
         select(null);
       }
 
