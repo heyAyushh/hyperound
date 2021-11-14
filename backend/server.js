@@ -18,20 +18,30 @@ fastify
     (err) => { if (err) throw err }
   )
   .register(require('fastify-cookie'))
-  .register(require('@fastify/session'),
-    {
-      secret: process.env.COOKIE_KEY,
-      cookie: {
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: SESSION_TTL,
-        sameSite: 'Lax',
-        httpOnly: true,
-        path: '/'
-        // domain: process.env.DOMAIN,
-        // options for setCookie, see https://github.com/fastify/fastify-cookie
-      },
-      // store: new Redis(REDIS_URI)
-    })
+  .register(require('@fastify/session'), {
+    secret: process.env.COOKIE_KEY,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: SESSION_TTL,
+      sameSite: 'Lax',
+      httpOnly: true,
+      path: '/'
+      // domain: process.env.DOMAIN,
+      // options for setCookie, see https://github.com/fastify/fastify-cookie
+    }
+  })
+  .register(require('fastify-jwt'), {
+    secret: process.env.JWT_SECRET,
+    sign: {
+      expiresIn: '1d',
+      // algorithm: 'ES256',
+      // issuer: 'api.hyepround.com',
+      // audience: 'hyperound.com',
+    },
+    // Global default verifying method options
+    // verify: { issuer: 'api.hyperound.com' }
+  })
+
   .register(grant({
     defaults: {
       origin: process.env.BASE_URL,

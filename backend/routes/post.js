@@ -17,7 +17,7 @@ module.exports = function (fastify, opts, done) {
   })
 
   fastify.get('/posts/user/:username', {
-    // preValidation: [fastify.authenticate],
+    preValidation: [fastify.authenticate],
   }, async (request, reply) => {
     try {
       const user = await User.findOne({ username: request.params.username })
@@ -58,7 +58,7 @@ module.exports = function (fastify, opts, done) {
     }
   }, async (request, reply) => {
     try {
-      if (request.body.creator !== String(request.session.user_id)) {
+      if (request.body.creator !== String(request.user.user_id)) {
         reply.code(403).send()
         return
       }
@@ -143,10 +143,10 @@ module.exports = function (fastify, opts, done) {
         reply.code(404).send()
         return
       } else {
-        if (!post.favorites.users.includes(request.session.user_id)) {
+        if (!post.favorites.users.includes(request.user.user_id)) {
           await Post.findByIdAndUpdate(request.params.postId, {
             $inc: { 'favorites.count': 1 },
-            $push: { 'favorites.users': request.session.user_id }
+            $push: { 'favorites.users': request.user.user_id }
           })
         }
       }
@@ -184,10 +184,10 @@ module.exports = function (fastify, opts, done) {
         reply.code(404).send()
         return
       } else {
-        if (post.favorites.users.includes(request.session.user_id)) {
+        if (post.favorites.users.includes(request.user.user_id)) {
           await Post.findByIdAndUpdate(request.params.postId, {
             $inc: { 'favorites.count': -1 },
-            $pull: { 'favorites.users': request.session.user_id }
+            $pull: { 'favorites.users': request.user.user_id }
           })
         }
       }

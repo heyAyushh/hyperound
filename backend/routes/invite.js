@@ -47,9 +47,9 @@ module.exports = function (fastify, opts, done) {
     }
   }, async (request, reply) => {
     try {
-      if (!String(request.session.user_id)) {
+      if (!String(request.user.user_id)) {
         reply.code(403).send({
-          text: 'Session not found!',
+          text: 'User JWT not found!',
           type: 'error'
         })
       }
@@ -63,7 +63,7 @@ module.exports = function (fastify, opts, done) {
         // update isCreator if invite found and number!=0
         if (invite && invite.redeems && invite.redeems.number && code.length === 7) {
           const number = invite.number - 1;
-          const user = request.session.user_id;
+          const user = request.user.user_id;
 
           const redeemed_by =  invite.redeems && invite.redeems.redeemed_by ? invite.redeems.redeemed_by : [];
 
@@ -155,7 +155,8 @@ module.exports = function (fastify, opts, done) {
 
       const code = nanoid(7).toUpperCase();
 
-      // const user_id = request.session.user_id;
+      // const user_id = request.session.get('user_id');
+      // hyperound account user_id for now
       const user_id = '61340274bc6058cb2e7dcc04';
       const user = await User.findOne({ _id: user_id });
 
